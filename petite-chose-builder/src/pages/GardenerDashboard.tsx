@@ -2,23 +2,60 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link } from "react-router-dom";
-import { MapPin, Calendar, ArrowRight, UserRound, Mail, Phone } from "lucide-react";
+import { MapPin, Calendar, ArrowRight, UserRound, Mail, Phone, ChevronLeft, ChevronRight } from "lucide-react";
+import { useState } from "react";
 
 const GardenerDashboard = () => {
   // Simuler des données qui viendraient du backend
-  const userInfo = {
-    name: "Sophie Martin",
-    membership: "Premium",
-    joinedDate: "Avril 2023",
-    email: "sophie.martin@example.com",
-    phone: "+33 6 12 34 56 78",
-    address: "12 rue des Jardins, 75011 Paris"
-  };
-  
-  const reservations = [
-    { id: 1, gardenName: "Jardin des Lilas", date: "15 juin 2023", status: "active" },
-    { id: 2, gardenName: "Potager Urbain", date: "3 mai 2023", status: "pending" }
+  const users = [
+    {
+      name: "Sophie Martin",
+      membership: "Premium",
+      joinedDate: "Avril 2023",
+      email: "sophie.martin@example.com",
+      phone: "+33 6 12 34 56 78",
+      address: "12 rue des Jardins, 75011 Paris",
+      reservations: [
+        { id: 1, gardenName: "Jardin des Lilas", date: "15 juin 2023", status: "active" },
+        { id: 2, gardenName: "Potager Urbain", date: "3 mai 2023", status: "pending" }
+      ]
+    },
+    {
+      name: "Thomas Dubois",
+      membership: "Standard",
+      joinedDate: "Janvier 2024",
+      email: "thomas.dubois@example.com",
+      phone: "+33 7 65 43 21 09",
+      address: "45 avenue des Fleurs, 75020 Paris",
+      reservations: [
+        { id: 3, gardenName: "Potager Collectif", date: "10 avril 2024", status: "active" }
+      ]
+    },
+    {
+      name: "Camille Legrand",
+      membership: "Premium",
+      joinedDate: "Mars 2024",
+      email: "camille.legrand@example.com",
+      phone: "+33 6 98 76 54 32",
+      address: "8 rue des Maraîchers, 75019 Paris",
+      reservations: [
+        { id: 4, gardenName: "Jardin Communautaire", date: "2 mai 2024", status: "active" },
+        { id: 5, gardenName: "Jardin des Lilas", date: "20 mai 2024", status: "pending" },
+        { id: 6, gardenName: "Les Jardins du Parc", date: "1 juin 2024", status: "pending" }
+      ]
+    }
   ];
+
+  const [currentUserIndex, setCurrentUserIndex] = useState(0);
+  const userInfo = users[currentUserIndex];
+
+  const nextUser = () => {
+    setCurrentUserIndex((prevIndex) => (prevIndex + 1) % users.length);
+  };
+
+  const prevUser = () => {
+    setCurrentUserIndex((prevIndex) => (prevIndex - 1 + users.length) % users.length);
+  };
   
   const nearbyGardens = [
     { id: 101, name: "Jardin Communautaire", distance: "1.2 km", available: true },
@@ -31,6 +68,17 @@ const GardenerDashboard = () => {
       <div className="max-w-6xl mx-auto">
         <div className="flex flex-wrap items-center justify-between mb-8 gap-4">
           <div>
+            <div className="flex items-center gap-3 mb-2">
+              <Button variant="outline" size="icon" onClick={prevUser} className="h-8 w-8">
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
+              <span className="text-sm text-muted-foreground">
+                {currentUserIndex + 1} sur {users.length}
+              </span>
+              <Button variant="outline" size="icon" onClick={nextUser} className="h-8 w-8">
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+            </div>
             <h1 className="text-3xl font-bold">Bienvenue, {userInfo.name}</h1>
             <p className="text-muted-foreground">
               Membre {userInfo.membership} depuis {userInfo.joinedDate}
@@ -90,9 +138,9 @@ const GardenerDashboard = () => {
               <CardDescription>Vos parcelles réservées et en attente</CardDescription>
             </CardHeader>
             <CardContent>
-              {reservations.length > 0 ? (
+              {userInfo.reservations.length > 0 ? (
                 <div className="space-y-4">
-                  {reservations.map(reservation => (
+                  {userInfo.reservations.map(reservation => (
                     <div key={reservation.id} className="border rounded-lg p-4 flex items-center justify-between">
                       <div>
                         <div className="font-medium">{reservation.gardenName}</div>
