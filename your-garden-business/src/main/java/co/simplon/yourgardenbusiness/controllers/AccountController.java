@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import co.simplon.yourgardenbusiness.dtos.AccountAuthenticate;
 import co.simplon.yourgardenbusiness.dtos.AccountCreate;
 import co.simplon.yourgardenbusiness.dtos.AuthInfo;
-import co.simplon.yourgardenbusiness.entities.Account;
+import co.simplon.yourgardenbusiness.entities.Users;
 import co.simplon.yourgardenbusiness.services.AccountService;
 import jakarta.validation.Valid;
 
@@ -25,7 +25,7 @@ public class AccountController {
 	this.service = service;
     }
 
-    @PostMapping
+	@PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     void create(@RequestBody @Valid AccountCreate inputs) {
 	service.create(inputs);
@@ -51,7 +51,7 @@ public class AccountController {
 
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    Account findById(@PathVariable Long id) {
+    Users findById(@PathVariable Long id) {
 	return service.findById(id);
     }
 }

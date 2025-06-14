@@ -1,5 +1,7 @@
 package co.simplon.yourgardenbusiness.services;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 
 import co.simplon.yourgardenbusiness.entities.Lands;
@@ -15,8 +17,15 @@ public class LandService {
 		this.repository = repository;
 	}
 
-	public Lands get() {
-		Lands land = this.repository.findAll().getLast();
+	public List<Lands> get() {
+		List<Lands> land = this.repository.findAll();
+		
+		return land;
+	}
+	
+	public Lands post(Lands  land) {
+	 land = this.repository.save(land);
+		
 		return land;
 	}
 }

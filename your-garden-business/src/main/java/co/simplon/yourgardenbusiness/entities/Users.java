@@ -1,25 +1,21 @@
 package co.simplon.yourgardenbusiness.entities;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "t_accounts")
-public class Account extends AbstractEntity {
-	
+@Table(name = "t_users")
+public class Users extends AbstractEntity {
+
+    @Column(name = "name")
+    private String name;
+    
+    @Column(name = "first_name")
+    private String first_name;
+
 	@Column(name = "email")
 	private String email;
-
-    @Column(name = "pseudo")
-    private String pseudo;
 
     @Column(name = "password")
     private String password;
@@ -27,45 +23,63 @@ public class Account extends AbstractEntity {
     // ManyToMany have optional: fetch = FetchType.EAGER : desactive lazyload par
     // default
     // fetch = FetchType.LAZY: default
-    @ManyToMany
+    /* @ManyToMany
     @JoinTable(name = "t_accounts_roles", joinColumns = @JoinColumn(name = "account_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
-    private Set<Role> roles;
+    private Set<Role> roles; */
 
-    public Account() {
+    public Users() {
 	// ORM
     }
 
-    public Account(String email, String pseudo, String password, Set<Role> roles) {
-    this.email = email;
-	this.pseudo = pseudo;
-	this.password = password;
-	this.roles = new HashSet<Role>(roles);
-    }
-
-    public String getPseudo() {
-	return pseudo;
-    }
-
-    public void setPseudo(String pseudo) {
-	this.pseudo = pseudo;
-    }
-
-    public String getPassword() {
-	return password;
-    }
-
-    public void setPassword(String password) {
+    public Users(  String name,String first_name,String email, String password) {
+	this.first_name = first_name;
+	this.name = name;
+	this.email = email;
 	this.password = password;
     }
 
-    public Set<Role> getRoles() {
-	return Collections.unmodifiableSet(roles);
-    }
+ 
+
+    public String getName() {
+		return name;
+	}
+
+	public String getFirst_name() {
+		return first_name;
+	}
+
+	public String getEmail() {
+		return email;
+	}
+
+	public String getPassword() {
+		return password;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public void setFirst_name(String first_name) {
+		this.first_name = first_name;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
+	}
 
     // roles.size
     @Override
     public String toString() {
-	return "{pseudo=" + pseudo + ", password=[PROTECTED]" + ", roles=LAZY_LOADING}";
+        return "{name=" + name +
+               ", first_name=" + first_name +
+               ", email=" + email +
+               ", password=[PROTECTED]" +
+               ", roles=LAZY_LOADING}";
     }
 }
 

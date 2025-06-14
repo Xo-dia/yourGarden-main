@@ -1,5 +1,7 @@
 package co.simplon.yourgardenbusiness.config;
 
+import java.util.List;
+
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
@@ -19,6 +21,9 @@ import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtValidators;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -27,34 +32,47 @@ import com.auth0.jwt.algorithms.Algorithm;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
-    @Value("${co.simplon.socwork.cors}")
+    @Value("${co.simplon.yourgardenbusiness.cors}")
     private String origins;
 
-    @Value("${co.simplon.socwork.cost}")
+    @Value("${co.simplon.yourgardenbusiness.cost}")
     private Integer cost;
 
-    @Value("${co.simplon.socwork.secret}")
+    @Value("${co.simplon.yourgardenbusiness.secret}")
     private String secret;
 
-    @Value("${co.simplon.socwork.jwt.expiration}")
+    @Value("${co.simplon.yourgardenbusiness.jwt.expiration}")
     private long expiration;
 
-    @Value("${co.simplon.socwork.jwt.issuer}")
+    @Value("${co.simplon.yourgardenbusiness.jwt.issuer}")
     private String issuer;
 
     // @Bean injection dependences
-    @Bean
+  /*  @Bean
     WebMvcConfigurer corsConfigurer() {
         return new WebMvcConfigurer() {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
-                        .allowedOrigins("http://localhost:3000", "http://localhost:5173")
+                        .allowedOrigins("http://localhost:3000", "http://localhost:5173", "http://localhost:8081")
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                         .allowedHeaders("*")
                         .allowCredentials(true);
             }
         };
+    }
+    */
+    @Bean
+    CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowedOrigins(List.of("http://localhost:8081")); // on peut ajouter 3000/5173 aussi
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        config.setAllowedHeaders(List.of("*"));
+        config.setAllowCredentials(true);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config);
+        return source;
     }
 
     @Bean
@@ -87,11 +105,13 @@ public class SecurityConfig {
 //			.permitAll().anyRequest().authenticated())
 //		.oauth2ResourceServer((srv) -> srv.jwt(Customizer.withDefaults())).build();
 
-	return http.cors(Customizer.withDefaults()).csrf(csrf -> csrf.disable())
+	return http.cors(cors -> cors.configurationSource(corsConfigurationSource()))/*cors(Customizer.withDefaults())*/
+			.csrf(csrf -> csrf.disable())
 		// Multiple matchers to map verbs + paths + authorizations
 		// "authorizations": anonymous, permit, deny and more...
 		// By configuration (filterChain), also by annotations...
-		.authorizeHttpRequests((req) -> req
+		.authorizeHttpRequests((req) -> req.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+
 			.requestMatchers(HttpMethod.POST, "/accounts", "/accounts/authenticate").anonymous())
 
 		.authorizeHttpRequests(

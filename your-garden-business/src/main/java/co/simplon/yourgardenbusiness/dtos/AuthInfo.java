@@ -6,7 +6,8 @@ public record AuthInfo(String token, List<String> roles) {
 
     @Override
     public String toString() {
-	return "{token=[PROTECTED]" + ", roles=" + roles + "}";
+	/* return "{token=[PROTECTED]" + ", roles=" + roles + "}"; */
+	return "{token=[PROTECTED]}";
     }
 
 }
