@@ -2,6 +2,8 @@ package co.simplon.yourgardenbusiness.entities;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 @Entity
@@ -25,6 +27,11 @@ public class Lands extends AbstractEntity {
 	
 	@Column(name = "land_desc")
 	private String description;
+	
+	   // Clé étrangère vers l'utilisateur
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private Users user;
 
 	public String getCadastral_reference() {
 		return cadastral_reference;
@@ -41,6 +48,14 @@ public class Lands extends AbstractEntity {
 	public int getnb_garden() {
 		return nb_gardens;
 	}
+	
+	public int getImageId() {
+		return imageId;
+	}
+	
+	public String description() {
+		return description;
+	}
 
 	public void setCadastral_reference(String cadastral_reference) {
 		this.cadastral_reference = cadastral_reference;
@@ -53,9 +68,25 @@ public class Lands extends AbstractEntity {
 	public void setLand_adresse(String land_adresse) {
 		this.land_adresse = land_adresse;
 	}
+	
+	public void setDescription(String description) {
+		this.description = description;
+	}
+	
+	public void setImageId(int imageId) {
+		this.imageId = imageId;
+	}
 
 	public void setNumber_of_garden(int nb_garden) {
 		this.nb_gardens = nb_garden;
 	}
+	
+    public Users getUser() {
+        return user;
+    }
+
+    public void setUser(Users user) {
+        this.user = user;
+    }
 	
 }

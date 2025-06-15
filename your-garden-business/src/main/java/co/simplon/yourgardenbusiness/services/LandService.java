@@ -4,17 +4,27 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import co.simplon.yourgardenbusiness.dtos.LandDto;
 import co.simplon.yourgardenbusiness.entities.Lands;
+import co.simplon.yourgardenbusiness.entities.Users;
+import co.simplon.yourgardenbusiness.mapping.LandMapper;
+import co.simplon.yourgardenbusiness.repositories.AccountRepository;
 import co.simplon.yourgardenbusiness.repositories.LandRepository;
+import jakarta.persistence.EntityNotFoundException;
 
 
 @Service
 public class LandService {
 
-	private final LandRepository repository;
+	private final LandRepository repository; 
+	private final AccountRepository accountRepository;
+	private final LandMapper landMapper;
 	
-	LandService(LandRepository repository){
+	
+	LandService(LandRepository repository, AccountRepository accountRepository, LandMapper landMapper){
 		this.repository = repository;
+		this.accountRepository = accountRepository;
+		this.landMapper = landMapper;
 	}
 
 	public List<Lands> get() {
@@ -23,9 +33,15 @@ public class LandService {
 		return land;
 	}
 	
-	public Lands post(Lands  land) {
-	 land = this.repository.save(land);
-		return land;
+	public LandDto post(LandDto  landDto) {
+		Users user = accountRepository.findById(landDto.user_id())
+				.orElseThrow(() -> new EntityNotFoundException("User not found"));
+		
+		Lands entity = landMapper.toEntity(landDto);
+		entity.setUser(user);
+		entity = this.repository.save(entity);
+		
+		return landMapper.toDto(entity);
 	}
 	
     public Lands updateProduit(Long id, Lands land) {

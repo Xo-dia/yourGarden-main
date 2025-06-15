@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.net.URI;
 import java.util.List;
 
+import co.simplon.yourgardenbusiness.dtos.LandDto;
 import co.simplon.yourgardenbusiness.entities.Lands;
 import co.simplon.yourgardenbusiness.services.LandService;
 
@@ -44,12 +45,12 @@ public class LandController {
 	
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
-	public ResponseEntity<Lands> postLand(@RequestBody Lands land) {
-		Lands response = null;
+	public ResponseEntity<LandDto> postLand(@RequestBody LandDto land) {
+		LandDto response = null;
 		
 		try {
 			response =  service.post(land);
-			return ResponseEntity.created(URI.create("/lands/" + response.getId())) // <== Location header
+			return ResponseEntity.created(URI.create("/lands/" + response.id())) // <== Location header
 	                .body(response);
 		}
 		catch (Exception ex) {
