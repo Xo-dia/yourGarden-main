@@ -60,3 +60,5 @@ insert into t_accounts_roles values (2 ,  15);
 
 insert into t_lands values (default, '93600123121234', 'zephir', '27 rue edgard degas', 52, null, 'jardin partager d edgard');
 select * from t_lands tl; 
+
+# un deux
