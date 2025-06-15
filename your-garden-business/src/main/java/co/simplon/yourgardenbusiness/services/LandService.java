@@ -25,7 +25,15 @@ public class LandService {
 	
 	public Lands post(Lands  land) {
 	 land = this.repository.save(land);
-		
 		return land;
 	}
+	
+    public Lands updateProduit(Long id, Lands land) {
+        // land.setId(id);
+        return this.repository.save(land);
+    }
+
+    public void deleteProduit(Long id) {
+        this.repository.deleteById(id);
+    }
 }
