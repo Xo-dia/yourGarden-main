@@ -2,8 +2,6 @@ import { SigninResponse } from "@/models/signin-response";
 
 // src/services/authService.ts
 export interface SigninPayload {
-  name: string;
-  first_name: string;
   email: string;
   password: string;
 }
@@ -11,7 +9,7 @@ export interface SigninPayload {
 const API_URL = 'http://localhost:8080';
 
 export const signin = async (payload: SigninPayload): Promise<SigninResponse> => {
-  const response = await fetch(`${API_URL}/accounts`, {
+  const response = await fetch(`${API_URL}/accounts/authenticate`, {
     method: 'POST',
     credentials: "include",
     headers: {

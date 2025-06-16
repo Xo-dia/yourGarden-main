@@ -6,6 +6,37 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "@/components/ui/use-toast";
+import { signin } from "@/services/authenticationService";
+
+// const Login = () => {
+//   const [email, setEmail] = useState("");
+//   const [password, setPassword] = useState("");
+//   const [isLoading, setIsLoading] = useState(false);
+//   const navigate = useNavigate();
+
+//   const handleSubmit = (event: React.FormEvent) => {
+//     event.preventDefault();
+//     setIsLoading(true);
+    
+//     // Simulation de connexion
+//     setTimeout(() => {
+//       console.log("Connexion:", { email, password });
+      
+//       // En production, cette logique serait basée sur les données de l'utilisateur
+//       // récupérées depuis le backend après authentification
+//       const userRole = email.includes("proprietaire") ? "owner" : "gardener";
+      
+//       toast({
+//         title: "Connexion réussie",
+//         description: `Vous êtes connecté en tant que ${userRole === "owner" ? "propriétaire" : "jardinier"}`,
+//       });
+      
+//       // Redirection vers la page appropriée selon le rôle
+//       navigate(userRole === "owner" ? "/owner-dashboard" : "/gardener-dashboard");
+      
+//       setIsLoading(false);
+//     }, 1000);
+//   };
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -13,28 +44,28 @@ const Login = () => {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleSubmit = (event: React.FormEvent) => {
+  const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     setIsLoading(true);
-    
-    // Simulation de connexion
-    setTimeout(() => {
-      console.log("Connexion:", { email, password });
-      
-      // En production, cette logique serait basée sur les données de l'utilisateur
-      // récupérées depuis le backend après authentification
-      const userRole = email.includes("proprietaire") ? "owner" : "gardener";
-      
+
+    try {
+      const userData = await signin({email, password}); // appel au backend
+
       toast({
         title: "Connexion réussie",
-        description: `Vous êtes connecté en tant que ${userRole === "owner" ? "propriétaire" : "jardinier"}`,
       });
-      
-      // Redirection vers la page appropriée selon le rôle
-      navigate(userRole === "owner" ? "/owner-dashboard" : "/gardener-dashboard");
-      
+
+      navigate("/gardener-dashboard");
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : "erreur inconnu"; 
+      toast({
+        title: "Erreur de connexion",
+        description: message || "Identifiants incorrects",
+        variant: "destructive",
+      });
+    } finally {
       setIsLoading(false);
-    }, 1000);
+    }
   };
 
   return (

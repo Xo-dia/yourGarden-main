@@ -34,7 +34,7 @@ const Signup = () => {
     
     setIsLoading(loading);
     
-    const result = await signinUser({ first_name, name, email, password });
+    const result = await signinUser({ email, password });
 
     if (result) {
       toast({
