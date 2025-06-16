@@ -29,8 +29,8 @@ public class LandController {
 	
 	@GetMapping
 	@ResponseStatus(HttpStatus.OK)
-	public ResponseEntity<List<Lands>> getLands() {
-		List<Lands> lands = null;
+	public ResponseEntity<List<LandDto>> getLands() {
+		List<LandDto> lands = null;
 		
 		try {
 			lands =  service.get();

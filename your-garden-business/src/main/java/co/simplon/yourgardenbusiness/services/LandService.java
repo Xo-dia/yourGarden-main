@@ -1,6 +1,7 @@
 package co.simplon.yourgardenbusiness.services;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
@@ -27,10 +28,11 @@ public class LandService {
 		this.landMapper = landMapper;
 	}
 
-	public List<Lands> get() {
+	public List<LandDto> get() {
 		List<Lands> land = this.repository.findAll();
-		
-		return land;
+		return land.stream()
+				.map( x -> landMapper.toDto(x))
+				.collect(Collectors.toList());
 	}
 	
 	public LandDto post(LandDto  landDto) {
