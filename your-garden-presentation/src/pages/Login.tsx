@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "@/components/ui/use-toast";
-import { signin } from "@/services/authenticationService";
+import { useAuth } from "@/context/AuthContext";
 
 // const Login = () => {
 //   const [email, setEmail] = useState("");
@@ -39,6 +39,7 @@ import { signin } from "@/services/authenticationService";
 //   };
 
 const Login = () => {
+  const { login } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -49,13 +50,13 @@ const Login = () => {
     setIsLoading(true);
 
     try {
-      const userData = await signin({email, password}); // appel au backend
+      const userData = await login({email, password}); // appel au backend
 
       toast({
         title: "Connexion réussie",
       });
 
-      navigate("/gardener-dashboard");
+      navigate("/post-login");
     } catch (error: unknown) {
       const message = error instanceof Error ? error.message : "erreur inconnu"; 
       toast({

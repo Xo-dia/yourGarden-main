@@ -1,18 +1,15 @@
-import { SigninPayload } from "@/models/signin-payload";
-import { SigninResponse } from "@/models/signin-response";
-import { User } from "@/models/user";
-
-// src/services/authService.ts
-
+import { Land } from "@/models/land";
 
 const API_URL = 'http://localhost:8080';
 
-export const signin = async (payload: SigninPayload): Promise<SigninResponse> => {
-  const response = await fetch(`${API_URL}/accounts/authenticate`, {
+export const land = async (payload: Land): Promise<Land> => {
+    const token = localStorage.getItem('token');
+  const response = await fetch(`${API_URL}/lands`, {
     method: 'POST',
     credentials: "include",
     headers: {
       'Content-Type': 'application/json',
+       "Authorization": `Bearer ${token}`, // ici tu mets ton token
     },
     body: JSON.stringify(payload),
   });
@@ -23,5 +20,8 @@ export const signin = async (payload: SigninPayload): Promise<SigninResponse> =>
     throw new Error(message);
   }
 
-  return response.json();
+  // Récupération du JSON (avec token et roles)
+  const data = (await response.json()) as Land;
+
+  return data;
 };

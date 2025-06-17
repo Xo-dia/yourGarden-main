@@ -8,10 +8,14 @@ import { toast } from "@/hooks/use-toast";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { land } from "@/services/LandService";
+import { Land } from "@/models/land";
+import { useAuth } from "@/context/AuthContext";
 
-const gardenFormSchema = z.object({
-  name: z.string().min(3, "Le nom du jardin doit comporter au moins 3 caractères"),
-  address: z.string().min(5, "Veuillez entrer une adresse valide"),
+const landFormSchema = z.object({
+  cadastral_reference: z.coerce.number().min(3, "Le numéro cadastral est requis"),
+  land_name: z.string().min(3, "Le nom du jardin doit comporter au moins 3 caractères"),
+  land_adresse: z.string().min(5, "Veuillez entrer une adresse valide"),
   city: z.string().min(2, "Veuillez entrer une ville valide"),
   postalCode: z.string().min(5, "Veuillez entrer un code postal valide"),
   description: z.string().min(20, "La description doit comporter au moins 20 caractères"),
@@ -20,16 +24,19 @@ const gardenFormSchema = z.object({
   price: z.string().min(1, "Veuillez préciser le prix mensuel"),
 });
 
-type GardenForm = z.infer<typeof gardenFormSchema>;
+type LandForm = z.infer<typeof landFormSchema>;
 
 const AddGarden = () => {
+  const { user, logout } = useAuth();
+
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
-  const form = useForm<GardenForm>({
-    resolver: zodResolver(gardenFormSchema),
+
+  const form = useForm<LandForm>({
+    resolver: zodResolver(landFormSchema),
     defaultValues: {
-      name: "",
-      address: "",
+      cadastral_reference: 100,
+      land_name: "",
+      land_adresse: "",
       city: "",
       postalCode: "",
       description: "",
@@ -38,20 +45,37 @@ const AddGarden = () => {
       price: "",
     },
   });
-  
-  const onSubmit = (data: GardenForm) => {
+
+  const onSubmit = async (data: LandForm) => {
     setIsSubmitting(true);
-    
-    // Simulation d'un appel API
-    setTimeout(() => {
-      console.log("Garden data:", data);
+
+    const payload: Land = {
+      cadastral_reference: String(data.cadastral_reference), // si attendu en string
+      land_name: data.land_name,
+      land_adresse: `${data.land_adresse}, ${data.city} ${data.postalCode}`,
+      nb_gardens: data.totalPlots,
+      imageId: 0, // ou récupéré dynamiquement
+      description: data.description,
+      user_id: user.user.id, // récupère dynamiquement l'ID du user connecté
+      id: 0 // souvent ignoré lors de l'insertion
+    };
+
+    try {
+      const response = await land(payload); // appel du bon service
       toast({
         title: "Jardin ajouté avec succès !",
-        description: "Votre jardin a été publié et est maintenant visible par les jardiniers.",
-      });
-      setIsSubmitting(false);
+        description: "Votre jardin a été publié.",
+      }); // format sonner
       form.reset();
-    }, 1500);
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : "erreur inconnu"; 
+      toast({
+        title: "Erreur",
+        description: message || "Erreur lors de l’ajout du jardin.",
+      }); // format sonner
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -72,7 +96,7 @@ const AddGarden = () => {
                 
                 <FormField
                   control={form.control}
-                  name="name"
+                  name="land_name"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Nom du jardin</FormLabel>
@@ -90,7 +114,7 @@ const AddGarden = () => {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <FormField
                     control={form.control}
-                    name="address"
+                    name="land_adresse"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Adresse</FormLabel>

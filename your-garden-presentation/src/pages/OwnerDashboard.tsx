@@ -4,8 +4,11 @@ import { Link } from "react-router-dom";
 import { Users, MapPin, Plus, Edit, Trash2, ArrowLeft } from "lucide-react";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { toast } from "@/components/ui/use-toast";
+import { useAuth } from "@/context/AuthContext";
 
 const OwnerDashboard = () => {
+  const { user, logout } = useAuth();
+
   // Simuler des données qui viendraient du backend
   const userInfo = {
     name: "Pierre Durand",
@@ -78,7 +81,7 @@ const OwnerDashboard = () => {
               </div>
             </div>
             <Button asChild>
-              <Link to="/add-garden">
+              <Link to="/add-land/">
                 <Plus className="h-4 w-4 mr-2" />
                 Ajouter un terrain
               </Link>
