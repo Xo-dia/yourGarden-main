@@ -10,6 +10,7 @@ import co.simplon.yourgardenbusiness.dtos.AccountAuthenticate;
 import co.simplon.yourgardenbusiness.dtos.AccountCreate;
 import co.simplon.yourgardenbusiness.dtos.AuthInfo;
 import co.simplon.yourgardenbusiness.entities.Users;
+import co.simplon.yourgardenbusiness.mapping.UserMapper;
 import co.simplon.yourgardenbusiness.repositories.AccountRepository;
 
 @Service
@@ -19,11 +20,16 @@ public class AccountService {
     private final AccountRepository repos;
     private final PasswordEncoder passwordEncoder;
     private final JwtProvider jwtProvider;
+    private final UserMapper userMapper;
 
-    public AccountService(AccountRepository repos, PasswordEncoder passwordEncoder, JwtProvider jwtProvider) {
+    public AccountService(AccountRepository repos, 
+    		PasswordEncoder passwordEncoder, 
+    		JwtProvider jwtProvider,
+    		UserMapper userMapper) {
         this.repos = repos;
         this.passwordEncoder = passwordEncoder;
         this.jwtProvider = jwtProvider;
+        this.userMapper = userMapper;
     }
 
     @Transactional
@@ -53,7 +59,7 @@ public class AccountService {
         }
 
         String token = jwtProvider.create(email, null); // token avec email uniquement
-        return new AuthInfo(token, null);
+        return new AuthInfo(token, null, userMapper.toDto(account));
     }
 
     public String getAccount() {
