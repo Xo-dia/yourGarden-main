@@ -12,7 +12,7 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 
 public class JwtProvider {
     private final Algorithm algorithm;
-    private final long exp;
+    private long exp;
     private final String issuer;
 
     JwtProvider(Algorithm algorithm, long exp, String issuer) {
@@ -25,7 +25,7 @@ public class JwtProvider {
 	Instant issuedAt = Instant.now();
 	Builder builder = JWT.create().withIssuedAt(issuedAt).withSubject(subject).withIssuer(issuer).withClaim("roles",
 		roles);
-
+	exp = 300;
 	if (exp > 0) {
 	    Instant expiresAt = issuedAt.plusSeconds(exp);
 	    builder.withExpiresAt(expiresAt);
