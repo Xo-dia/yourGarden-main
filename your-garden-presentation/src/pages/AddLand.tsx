@@ -47,20 +47,26 @@ const AddGarden = () => {
   });
 
   const onSubmit = async (data: LandForm) => {
+      console.log('avant atry')
     setIsSubmitting(true);
 
     const payload: Land = {
       cadastral_reference: String(data.cadastral_reference), // si attendu en string
       land_name: data.land_name,
       land_adresse: `${data.land_adresse}, ${data.city} ${data.postalCode}`,
+      postalCode: "93600",
+      city: "Paris",
       nb_gardens: data.totalPlots,
       imageId: 0, // ou récupéré dynamiquement
       description: data.description,
-      user_id: user.user.id, // récupère dynamiquement l'ID du user connecté
-      id: 0 // souvent ignoré lors de l'insertion
+      user_id: 1, // récupère dynamiquement l'ID du user connecté
+      id: 0, // souvent ignoré lors de l'insertion
+      plotSize: "15",
+      price: "15"
     };
 
     try {
+      console.log('avant appel land')
       const response = await land(payload); // appel du bon service
       toast({
         title: "Jardin ajouté avec succès !",

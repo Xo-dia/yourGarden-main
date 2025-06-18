@@ -4,6 +4,7 @@ const API_URL = 'http://localhost:8080';
 
 export const land = async (payload: Land): Promise<Land> => {
     const token = localStorage.getItem('token');
+    console.log(" hello land" + payload);
   const response = await fetch(`${API_URL}/lands`, {
     method: 'POST',
     credentials: "include",
