@@ -10,7 +10,7 @@ export const land = async (payload: Land): Promise<Land> => {
     credentials: "include",
     headers: {
       'Content-Type': 'application/json',
-       "Authorization": `Bearer ${token}`, // ici tu mets ton token
+       "Authorization": `Bearer ${token}`, // ici on met le token
     },
     body: JSON.stringify(payload),
   });
@@ -21,7 +21,7 @@ export const land = async (payload: Land): Promise<Land> => {
     throw new Error(message);
   }
 
-  // Récupération du JSON (avec token et roles)
+  // Récupération du JSON (avec token et 'roles')
   const data = (await response.json()) as Land;
 
   return data;

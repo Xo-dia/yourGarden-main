@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -7,20 +6,17 @@ import { Input } from "@/components/ui/input";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "@/components/ui/use-toast";
 import { ArrowRight } from "lucide-react";
-import { useSignin } from "@/hooks/use-signin";
 
 const Signup = () => {
-  const { signinUser, loading, error } = useSignin();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [first_name, setFirstName] = useState("");
-  const [name, setLastName] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-  
 
-  const  handleSubmit = async (event: React.FormEvent) => {
+  const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
     
     if (password !== confirmPassword) {
@@ -32,24 +28,22 @@ const Signup = () => {
       return;
     }
     
-    setIsLoading(loading);
+    setIsLoading(true);
     
-    const result = await signinUser({ email, password });
-
-    if (result) {
+    // Simulation d'inscription
+    setTimeout(() => {
+      console.log("Inscription:", { email, password, firstName, lastName });
+      
       toast({
         title: "Inscription réussie",
         description: "Votre compte a été créé avec succès",
       });
-
+      
+      // Redirection vers la page de connexion
       navigate("/login");
-
+      
       setIsLoading(false);
-      console.log('Token :', result.token);
-      console.log('User :', result.user);
-    }
-
-    //TODO: Gérer en cas d'erreur
+    }, 1000);
   };
 
   return (
@@ -73,7 +67,7 @@ const Signup = () => {
                     id="firstName" 
                     type="text" 
                     placeholder="Jean"
-                    value={first_name}
+                    value={firstName}
                     onChange={(e) => setFirstName(e.target.value)}
                     required
                   />
@@ -84,7 +78,7 @@ const Signup = () => {
                     id="lastName" 
                     type="text" 
                     placeholder="Dupont"
-                    value={name}
+                    value={lastName}
                     onChange={(e) => setLastName(e.target.value)}
                     required
                   />

@@ -4,11 +4,8 @@ import { Link } from "react-router-dom";
 import { Users, MapPin, Plus, Edit, Trash2, ArrowLeft } from "lucide-react";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { toast } from "@/components/ui/use-toast";
-import { useAuth } from "@/context/AuthContext";
 
 const OwnerDashboard = () => {
-  const { user, logout } = useAuth();
-
   // Simuler des données qui viendraient du backend
   const userInfo = {
     name: "Pierre Durand",
@@ -81,7 +78,7 @@ const OwnerDashboard = () => {
               </div>
             </div>
             <Button asChild>
-              <Link to="/add-land/">
+              <Link to="/add-land">
                 <Plus className="h-4 w-4 mr-2" />
                 Ajouter un terrain
               </Link>
@@ -126,8 +123,14 @@ const OwnerDashboard = () => {
                             {garden.occupiedParcels} parcelles occupées sur {garden.parcels}
                           </div>
                           <div className="flex gap-2">
-                            <Button asChild variant="outline" size="sm" className="flex-1">
-                              <Link to={`/edit-garden/${garden.id}`} className="flex items-center justify-center gap-1">
+                            <Button asChild variant="outline" size="sm">
+                              <Link to={`/manage-lands/${garden.id}`} className="flex items-center justify-center gap-1">
+                                <Users className="h-4 w-4" />
+                                Gérer
+                              </Link>
+                            </Button>
+                            <Button asChild variant="outline" size="sm">
+                              <Link to={`/edit-land/${garden.id}`} className="flex items-center justify-center gap-1">
                                 <Edit className="h-4 w-4" />
                                 Modifier
                               </Link>
@@ -135,11 +138,10 @@ const OwnerDashboard = () => {
                             <Button 
                               variant="outline" 
                               size="sm" 
-                              className="flex-1 text-destructive hover:text-destructive"
+                              className="text-destructive hover:text-destructive"
                               onClick={() => handleDeleteGarden(garden.id, garden.name)}
                             >
-                              <Trash2 className="h-4 w-4 mr-1" />
-                              Supprimer
+                              <Trash2 className="h-4 w-4" />
                             </Button>
                           </div>
                         </div>
@@ -150,7 +152,7 @@ const OwnerDashboard = () => {
                   <div className="text-center py-8">
                     <p className="text-muted-foreground mb-4">Vous n'avez pas encore de terrain</p>
                     <Button asChild>
-                      <Link to="/add-garden">Ajouter un terrain</Link>
+                      <Link to="/add-land">Ajouter un terrain</Link>
                     </Button>
                   </div>
                 )}
