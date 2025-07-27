@@ -8,7 +8,7 @@ String email,
 
 String first_name, 
 
-String name,
+String last_name,
 
 @NotBlank 
 String password) {
@@ -16,7 +16,7 @@ String password) {
 	 @Override
 	    public String toString() {
 	        return "{email=" + email + 
-	        		", name=" + name + 
+	        		",last_name=" + last_name + 
 	        		",first_name=" + first_name + 
 	        		", password=[PROTECTED]}";
 	    }

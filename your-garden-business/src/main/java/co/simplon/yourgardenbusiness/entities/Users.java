@@ -8,8 +8,8 @@ import jakarta.persistence.Table;
 @Table(name = "t_users")
 public class Users extends AbstractEntity {
 
-    @Column(name = "name")
-    private String name;
+    @Column(name = "last_name")
+    private String last_name;
     
     @Column(name = "first_name")
     private String first_name;
@@ -31,17 +31,17 @@ public class Users extends AbstractEntity {
 	// ORM
     }
 
-    public Users(  String name,String first_name,String email, String password) {
+    public Users(  String last_name,String first_name,String email, String password) {
 	this.first_name = first_name;
-	this.name = name;
+	this.last_name = last_name;
 	this.email = email;
 	this.password = password;
     }
 
  
 
-    public String getName() {
-		return name;
+    public String getLast_name() {
+		return last_name;
 	}
 
 	public String getFirst_name() {
@@ -56,8 +56,8 @@ public class Users extends AbstractEntity {
 		return password;
 	}
 
-	public void setName(String name) {
-		this.name = name;
+	public void setLast_name(String last_name) {
+		this.last_name = last_name;
 	}
 
 	public void setFirst_name(String first_name) {
@@ -75,7 +75,7 @@ public class Users extends AbstractEntity {
     // roles.size
     @Override
     public String toString() {
-        return "{name=" + name +
+        return "{last_name=" + last_name +
                ", first_name=" + first_name +
                ", email=" + email +
                ", password=[PROTECTED]" +

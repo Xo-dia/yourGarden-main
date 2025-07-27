@@ -25,14 +25,15 @@ public class LandMapper {
     public LandDto toDto(Lands land) {
         if (land == null) return null;
 
-        LandDto dto = new LandDto(land.getCadastral_reference(),
+        LandDto dto = new LandDto(land.getId(),
+        		land.getUser().getId(),
+        		land.getCadastral_reference(),
         		land.getLand_name(),
         		land.getLand_adresse(),
         		land.getnb_garden(),
         		land.getImageId(),
-        		land.description(),
-        		land.getUser().getId(),
-        		land.getId());
+        		land.description()
+        		);
 
         return dto;
     }

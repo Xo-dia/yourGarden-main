@@ -1,69 +1,82 @@
 // context/AuthContext.tsx
 
+import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { SigninPayload } from "@/models/signin-payload";
 import { SigninResponse } from "@/models/signin-response";
 import { signin } from "@/services/authenticationService";
-import {
-  createContext,
-  useContext,
-  useState,
-  ReactNode,
-  useEffect,
-} from "react";
-// import { signin, SigninPayload, SigninResponse } from "../services/authService";
+
+// Interface du token décodé
+interface DecodedToken {
+  exp: number;
+}
 
 interface AuthContextType {
   user: SigninResponse | null;
   login: (payload: SigninPayload) => Promise<void>;
   logout: () => void;
   isAuthenticated: boolean;
+  token: string | null;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<SigninResponse | null>(() => {
-    const stored = localStorage.getItem("authUser");
-       console.log("hello" + stored);
-    return stored ? JSON.parse(stored) : null;
-  });
+  const [user, setUser] = useState<SigninResponse | null>(null);
+  const [token, setToken] = useState<string | null>(null);
 
+  // Initialisation : charge le user depuis localStorage
   useEffect(() => {
-  const stored = localStorage.getItem("authUser");
-  if (stored) {
-    const parsed = JSON.parse(stored);
-    console.log("authUser rechargé :", parsed);
-    setUser(parsed); // ✅ recharge le user dans le state
-  }
-}, []);
+    const storedUser = localStorage.getItem("authUser");
+    const storedToken = localStorage.getItem("token");
+
+    if (storedUser && storedToken) {
+      setUser(JSON.parse(storedUser));
+      setToken(storedToken);
+    } else {
+      logout(); // token invalide ou inexistant
+    }
+  }, []);
+
+  // Sync automatique localStorage <-> state
+  useEffect(() => {
+    if (user && token) {
+      localStorage.setItem("authUser", JSON.stringify(user));
+      localStorage.setItem("token", token);
+    } else {
+      localStorage.removeItem("authUser");
+      localStorage.removeItem("token");
+    }
+  }, [user, token]);
 
   const login = async (payload: SigninPayload) => {
-    console.log("start login");
-    const response = await signin(payload);
-    console.log(response);
-    setUser(response);
-    localStorage.setItem("authUser", JSON.stringify(response));
-    localStorage.setItem("token", response.token); // optionnel, si tu veux séparer
+    try {
+      const response = await signin(payload);
+      setUser(response);
+      setToken(response.token);
+    } catch (error) {
+      console.error("Erreur de connexion :", error);
+      throw error; // à gérer côté UI (affichage erreur)
+    }
   };
 
   const logout = () => {
     setUser(null);
+    setToken(null);
     localStorage.removeItem("authUser");
     localStorage.removeItem("token");
   };
 
-  const isAuthenticated = !!user;
+  const isAuthenticated = !!user && !!token;
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, isAuthenticated }}>
+    <AuthContext.Provider value={{ user, login, logout, isAuthenticated, token }}>
       {children}
     </AuthContext.Provider>
   );
 };
 
-export const useAuth = () => {
+export const useAuth = (): AuthContextType => {
   const context = useContext(AuthContext);
-  if (!context)
-    throw new Error("useAuth must be used within an AuthProvider");
+  if (!context) throw new Error("useAuth must be used within an AuthProvider");
   return context;
 };

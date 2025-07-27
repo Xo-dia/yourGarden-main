@@ -12,7 +12,7 @@ public class UserMapper {
 	        if (dto == null) return null;
 
 	        Users user = new Users();
-	        user.setName(dto.name());
+	        user.setLast_name(dto.last_name());
 	        user.setFirst_name(dto.first_name());
 
 	        return user;
@@ -22,7 +22,7 @@ public class UserMapper {
 	        if (user == null) return null;
 
 	        UserDto dto = new UserDto(user.getId(),
-	        		user.getName(),
+	        		user.getLast_name(),
 	        		user.getFirst_name());
 
 	        return dto;

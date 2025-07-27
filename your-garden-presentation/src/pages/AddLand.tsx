@@ -9,6 +9,9 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/context/AuthContext";
+import { addLand } from "@/services/LandService";
+import { Land } from "@/models/land";
 
 const landFormSchema = z.object({
   cadastral_reference: z.string().min(5, "La référence cadastrale doit comporter au moins 5 caractères"),
@@ -25,6 +28,7 @@ const AddLand = () => {
   console.log("AddLand component is loading with terrainFormSchema");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
+  const { token } = useAuth();
   
   const form = useForm<LandForm>({
     resolver: zodResolver(landFormSchema),
@@ -42,40 +46,58 @@ const AddLand = () => {
     setIsSubmitting(true);
     
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const payload : Land = {
+        cadastral_reference: data.cadastral_reference,
+        land_name: data.name,
+        land_adresse: data.address,
+        nb_gardens: data.number_of_gardens,
+        // ima: data.image_url || null,
+        description: data.description,
+        postalCode: "",
+        city: "",
+        imageId: 0,
+        user_id: 0,
+        id: 0,
+        plotSize: "",
+        price: ""
+      }
+      console.log("Payload to add land:", token);
+      // Call the addLand service with the payload and token
+      const land = await addLand(payload, token); 
+      // const { data: { user } } = await supabase.auth.getUser();
       
-      if (!user) {
-        toast({
-          title: "Erreur d'authentification",
-          description: "Vous devez être connecté pour créer un terrain.",
-          variant: "destructive",
-        });
-        return;
-      }
+      // if (!user) {
+      //   toast({
+      //     title: "Erreur d'authentification",
+      //     description: "Vous devez être connecté pour créer un terrain.",
+      //     variant: "destructive",
+      //   });
+      //   return;
+      // }
 
-      const { data: land, error } = await supabase
-        .from('lands')
-        .insert({
-          cadastral_reference: data.cadastral_reference,
-          name: data.name,
-          address: data.address,
-          number_of_gardens: data.number_of_gardens,
-          image_url: data.image_url || null,
-          description: data.description,
-          owner_id: user.id,
-        })
-        .select()
-        .single();
+      // const { data: land, error } = await supabase
+      //   .from('lands')
+      //   .insert({
+      //     cadastral_reference: data.cadastral_reference,
+      //     name: data.name,
+      //     address: data.address,
+      //     number_of_gardens: data.number_of_gardens,
+      //     image_url: data.image_url || null,
+      //     description: data.description,
+      //     owner_id: user.id,
+      //   })
+      //   .select()
+      //   .single();
 
-      if (error) {
-        console.error('Error creating land:', error);
-        toast({
-          title: "Erreur lors de la création",
-          description: error.message,
-          variant: "destructive",
-        });
-        return;
-      }
+      // if (error) {
+      //   console.error('Error creating land:', error);
+      //   toast({
+      //     title: "Erreur lors de la création",
+      //     description: error.message,
+      //     variant: "destructive",
+      //   });
+      //   return;
+      // }
 
       toast({
         title: "Terrain créé avec succès !",

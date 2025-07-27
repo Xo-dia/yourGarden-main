@@ -1,7 +1,7 @@
 package co.simplon.yourgardenbusiness.dtos;
 
 public record UserDto (Long id, 
-		String name, 
+		String last_name, 
 		String first_name) {
 	
 }

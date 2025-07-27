@@ -35,7 +35,7 @@ public class AccountService {
     @Transactional
     public void create(AccountCreate inputs) {
         String email = inputs.email();
-        String name = inputs.name();
+        String lastName = inputs.last_name();
         String firstName = inputs.first_name();
 
         if (repos.existsByEmailIgnoreCase(email)) {
@@ -44,7 +44,7 @@ public class AccountService {
 
         String password = passwordEncoder.encode(inputs.password());
 
-        Users entity = new Users(name, firstName, email, password);
+        Users entity = new Users(lastName, firstName, email, password);
         repos.save(entity);
     }
 

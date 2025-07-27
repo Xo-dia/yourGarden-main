@@ -2,9 +2,11 @@ import { Land } from "@/models/land";
 
 const API_URL = 'http://localhost:8080';
 
-export const land = async (payload: Land): Promise<Land> => {
-    const token = localStorage.getItem('token');
+
+export const addLand = async (payload: Land, token: string): Promise<Land> => {
     console.log(" hello land" + payload);
+          console.log("Payload to add land:", token);
+
   const response = await fetch(`${API_URL}/lands`, {
     method: 'POST',
     credentials: "include",

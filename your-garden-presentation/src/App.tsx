@@ -13,9 +13,11 @@ import Signup from "./pages/Signup";
 import PostLogin from "./pages/PostLogin";
 import GardenerDashboard from "./pages/GardenerDashboard";
 import OwnerDashboard from "./pages/OwnerDashboard";
-import ManageLands from "./pages/ManageLands";
+// import ManageLands from "./pages/ManageLands";
 import NotFound from "./pages/NotFound";
 import Navbar from "./components/Navbar";
+import { AuthProvider } from "./context/AuthContext";
+import PrivateRoute from "./components/privateRoute";
 
 const queryClient = new QueryClient();
 
@@ -35,10 +37,9 @@ const AppContent = () => {
         <Route path="/edit-land/:id" element={<EditLand />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
-        <Route path="/post-login" element={<PostLogin />} />
+        <Route path="/post-login" element={<PrivateRoute><PostLogin /></PrivateRoute>} />
         <Route path="/gardener-dashboard" element={<GardenerDashboard />} />
         <Route path="/owner-dashboard" element={<OwnerDashboard />} />
-        <Route path="/manage-lands/:terrainId" element={<ManageLands />} />
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
         <Route path="*" element={<NotFound />} />
       </Routes>
@@ -52,7 +53,9 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <AppContent />
+        <AuthProvider>
+          <AppContent />
+        </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
