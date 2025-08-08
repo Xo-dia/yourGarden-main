@@ -9,6 +9,7 @@ import co.simplon.yourgardenbusiness.config.JwtProvider;
 import co.simplon.yourgardenbusiness.dtos.AccountAuthenticate;
 import co.simplon.yourgardenbusiness.dtos.AccountCreate;
 import co.simplon.yourgardenbusiness.dtos.AuthInfo;
+import co.simplon.yourgardenbusiness.dtos.UserDto;
 import co.simplon.yourgardenbusiness.entities.Users;
 import co.simplon.yourgardenbusiness.mapping.UserMapper;
 import co.simplon.yourgardenbusiness.repositories.AccountRepository;
@@ -69,6 +70,12 @@ public class AccountService {
     public Users findById(Long id) {
         return repos.findById(id)
             .orElseThrow(() -> new BadCredentialsException("Utilisateur non trouvé"));
+    }
+    
+    // ★★★ Nouvelle méthode demandée ★★★
+    public UserDto findByIdDto(Long id) {
+        Users u = findById(id);      // réutilise la logique existante (et l’exception si non trouvé)
+        return userMapper.toDto(u);  // mappe vers le DTO public
     }
 }
 
