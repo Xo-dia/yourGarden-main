@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "@/components/ui/use-toast";
 import { ArrowRight } from "lucide-react";
+import { accountService } from "@/services/accountService";
 
 const API_URL = 'http://localhost:8080';
 
@@ -54,31 +55,16 @@ const handleSubmit = async (e: React.FormEvent) => {
 
   setIsLoading(true);
 
-  const dataToSend = {
+  try {
+    const response = await accountService.createAccount({
     first_name: formData.firstName,
     last_name: formData.lastName,
     email: formData.email,
-    password: formData.password
-  };
+    password: formData.password,
+  });
+  navigate("/login");
+  toast({ title: "Inscription réussie !" });
 
-  try {
-    const response = await fetch(`${API_URL}/accounts`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(dataToSend),
-    });
-
-    if (response.ok) {
-      toast({ title: "Inscription réussie !" });
-      navigate("/login");
-    } else {
-      const error = await response.json();
-      toast({
-        title: "Erreur",
-        description: error.message || "Une erreur est survenue.",
-        variant: "destructive"
-      });
-    }
   } catch (err) {
     console.error(err);
     toast({

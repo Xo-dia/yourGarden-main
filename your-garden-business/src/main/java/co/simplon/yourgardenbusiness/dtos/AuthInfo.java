@@ -2,12 +2,12 @@ package co.simplon.yourgardenbusiness.dtos;
 
 import java.util.List;
 
-public record AuthInfo(String token, List<String> roles, UserDto userDto) {
+public record AuthInfo(String accessToken, List<String> roles, UserDto user) {
 
     @Override
     public String toString() {
-	/* return "{token=[PROTECTED]" + ", roles=" + roles + "}"; */
-	return "{token=[PROTECTED]}";
+	/* return "{accessToken=[PROTECTED]" + ", roles=" + roles + "}"; */
+	return "{accessToken=[PROTECTED]}";
     }
 
 }

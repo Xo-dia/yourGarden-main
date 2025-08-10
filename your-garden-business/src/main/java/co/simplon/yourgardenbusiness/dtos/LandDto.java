@@ -8,5 +8,5 @@ public record LandDto (
 		String land_adresse,
 		int nb_gardens,
 		int imageId,
-		String description) {}
+		String description) { }
 

@@ -59,7 +59,8 @@ public class AccountService {
             throw new BadCredentialsException("Mot de passe incorrect");
         }
 
-        String token = jwtProvider.create(email, null); // token avec email uniquement
+        var id = String.valueOf(account.getId());
+        String token = jwtProvider.create(id, null); // token avec email uniquement
         return new AuthInfo(token, null, userMapper.toDto(account));
     }
 

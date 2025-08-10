@@ -7,11 +7,10 @@ import { toast } from "@/hooks/use-toast";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "@/context/AuthContext";
 import { addLand } from "@/services/LandService";
 import { Land } from "@/models/land";
+import { useAuth } from "@/context/AuthContext";
 
 const landFormSchema = z.object({
   cadastral_reference: z.string().min(5, "La référence cadastrale doit comporter au moins 5 caractères"),
@@ -28,7 +27,7 @@ const AddLand = () => {
   console.log("AddLand component is loading with terrainFormSchema");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
-  const { token } = useAuth();
+    const { user } = useAuth();
   
   const form = useForm<LandForm>({
     resolver: zodResolver(landFormSchema),
@@ -56,16 +55,20 @@ const AddLand = () => {
         postalCode: "",
         city: "",
         imageId: 0,
-        user_id: 0,
+        user_id: user.id,
         id: 0,
         plotSize: "",
         price: ""
       }
-      console.log("Payload to add land:", token);
       // Call the addLand service with the payload and token
-      const land = await addLand(payload, token); 
-      // const { data: { user } } = await supabase.auth.getUser();
-      
+    const land: Land = await addLand(payload);      // const { data: { user } } = await supabase.auth.getUser();
+            toast({
+        title: "Terrain créé avec succès !",
+        description: "Vous pouvez maintenant ajouter des jardins à votre terrain.",
+      });
+
+      // suppose que l’API renvoie l’objet avec un id
+      navigate(`/manage-lands/${land.id}`);
       // if (!user) {
       //   toast({
       //     title: "Erreur d'authentification",

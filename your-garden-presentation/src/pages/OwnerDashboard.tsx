@@ -49,17 +49,6 @@ const OwnerDashboard = () => {
 
   return (
     <div className="min-h-screen">
-      {/* Header avec titre JardinPartage */}
-      <header className="fixed top-0 left-0 right-0 bg-background/80 backdrop-blur-md z-50 border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <Link to="/" className="flex items-center">
-              <span className="text-xl font-bold text-primary">JardinPartage</span>
-            </Link>
-          </div>
-        </div>
-      </header>
-
       <div className="pt-24 pb-12 px-4">
         <div className="max-w-6xl mx-auto">
           <div className="flex flex-wrap items-center justify-between mb-8 gap-4">

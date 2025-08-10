@@ -17,7 +17,7 @@ import OwnerDashboard from "./pages/OwnerDashboard";
 import NotFound from "./pages/NotFound";
 import Navbar from "./components/Navbar";
 import { AuthProvider } from "./context/AuthContext";
-import PrivateRoute from "./components/privateRoute";
+import RedirectIfAuthed from "./guards/RedirectIfAuthed";
 
 const queryClient = new QueryClient();
 
@@ -35,9 +35,13 @@ const AppContent = () => {
         <Route path="/gardens/:id" element={<GardenDetail />} />
         <Route path="/add-land" element={<AddLand />} />
         <Route path="/edit-land/:id" element={<EditLand />} />
-        <Route path="/login" element={<Login />} />
+        <Route path="/login" element={
+           <RedirectIfAuthed to="/post-login">
+            <Login />
+           </RedirectIfAuthed>
+          } />
         <Route path="/signup" element={<Signup />} />
-        <Route path="/post-login" element={<PrivateRoute><PostLogin /></PrivateRoute>} />
+        <Route path="/post-login" element={<PostLogin />} />
         <Route path="/gardener-dashboard" element={<GardenerDashboard />} />
         <Route path="/owner-dashboard" element={<OwnerDashboard />} />
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "@/components/ui/use-toast";
+import { useAuth } from "@/context/AuthContext";
 
 // const Login = () => {
 //   const [email, setEmail] = useState("");
@@ -40,26 +41,27 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const { login } = useAuth();
+  
   const navigate = useNavigate();
 
-  const handleSubmit = (event: React.FormEvent) => {
+const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setIsLoading(true);
-    
-    // Simulation de connexion
-    setTimeout(() => {
-      console.log("Connexion:", { email, password });
-      
-      toast({
-        title: "Connexion réussie",
-        description: "Vous êtes maintenant connecté",
-      });
-      
-      // Redirection vers la page post-connexion
+    // setErrorMsg(null);
+    try {
+      const user = await login({ email, password });
       navigate("/post-login");
-      
+    } catch (err: any) {
+      // Option : si tu utilises ApiError(status, details) dans fetchClient
+      const msg =
+        err?.details?.message ??
+        err?.message ??
+        "Échec de la connexion. Vérifiez vos identifiants.";
+      //setErrorMsg(msg);
+    } finally {
       setIsLoading(false);
-    }, 1000);
+    }
   };
 
   return (
@@ -128,3 +130,7 @@ const Login = () => {
 };
 
 export default Login;
+function setErrorMsg(msg: any) {
+  throw new Error("Function not implemented.");
+}
+

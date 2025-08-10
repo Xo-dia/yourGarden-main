@@ -1,30 +1,32 @@
-import { Land } from "@/models/land";
+import { apiFetch } from "@/services/fetchClient";
+import type { Land } from "@/models/land";
 
-const API_URL = 'http://localhost:8080';
+// Si ton backend attend une forme plus simple pour la création,
+// crée un DTO dédié. Adapte les clés aux attentes de l’API.
+// export interface CreateLandDto {
+//   cadastral_reference: string;
+//   land_name: string;
+//   land_adresse: string;
+//   nb_gardens: number;
+//   image_url?: string | null;
+//   description: string;
+//   postalCode?: string;
+//   city?: string;
+//   imageId?: number;
+//   plotSize?: string;
+//   price?: string;
+//   // NE PAS envoyer id / user_id si le serveur les gère
+// }
 
-
-export const addLand = async (payload: Land, token: string): Promise<Land> => {
-    console.log(" hello land" + payload);
-          console.log("Payload to add land:", token);
-
-  const response = await fetch(`${API_URL}/lands`, {
-    method: 'POST',
-    credentials: "include",
-    headers: {
-      'Content-Type': 'application/json',
-       "Authorization": `Bearer ${token}`, // ici on met le token
-    },
-    body: JSON.stringify(payload),
+export async function addLand(dto: Land): Promise<Land> {
+  // POST /lands doit renvoyer l’objet créé (id, …).
+  // Si ton backend renvoie 201 sans body, il faudra l’ajuster.
+  return apiFetch<Land>("/lands", {
+    method: "POST",
+    json: dto,
   });
+}
 
-  if (!response.ok) {
-    const errorData = await response.json().catch(() => null);
-    const message = errorData?.message || 'Erreur lors de la connexion.';
-    throw new Error(message);
-  }
-
-  // Récupération du JSON (avec token et 'roles')
-  const data = (await response.json()) as Land;
-
-  return data;
-};
+export async function getLand(id: number): Promise<Land> {
+  return apiFetch<Land>(`/lands/${id}`, { method: "GET" });
+}

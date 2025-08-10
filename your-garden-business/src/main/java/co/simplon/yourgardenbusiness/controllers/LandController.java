@@ -55,6 +55,7 @@ public class LandController {
 		}
 		catch (Exception ex) {
 			//TODO; logger
+            System.out.println(ex.getMessage());
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(land);
 		}
 		

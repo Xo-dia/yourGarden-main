@@ -16,19 +16,26 @@ public class JwtProvider {
     private final String issuer;
 
     JwtProvider(Algorithm algorithm, long exp, String issuer) {
-	this.algorithm = algorithm;
-	this.exp = exp;
-	this.issuer = issuer;
+        this.algorithm = algorithm;
+        this.exp = exp;
+        this.issuer = issuer;
     }
 
     public String create(String subject, List<String> roles) {
-	Instant issuedAt = Instant.now();
-	Builder builder = JWT.create().withIssuedAt(issuedAt).withSubject(subject).withIssuer(issuer).withClaim("roles",
-		roles);
-	if (exp > 0) {
-	    Instant expiresAt = issuedAt.plusSeconds(exp);
-	    builder.withExpiresAt(expiresAt);
-	}
-	return builder.sign(algorithm);
+        Instant issuedAt = Instant.now();
+        int days = 7; // nombre de jours de validité
+
+        Builder builder = JWT.create()
+                             .withIssuedAt(issuedAt)
+                             .withSubject(subject)
+                             .withIssuer(issuer)
+                             .withClaim("roles", roles);
+
+        if (exp > 0) {
+            Instant expiresAt = issuedAt.plus(days, java.time.temporal.ChronoUnit.DAYS);
+            builder.withExpiresAt(expiresAt);
+        }
+
+        return builder.sign(algorithm);
     }
 }

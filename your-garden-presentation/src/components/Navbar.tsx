@@ -1,23 +1,27 @@
-
 import * as React from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Menu, X } from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
 
 const Navbar = () => {
   const location = useLocation();
   const isMobile = useIsMobile();
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
-  // Pour simuler un utilisateur connecté, à remplacer par la logique d'authentification réelle
-  const [isLoggedIn, setIsLoggedIn] = React.useState(false);
-  const [userRole, setUserRole] = React.useState<"gardener" | "owner" | null>(null);
 
-  // Fonction de simulation de déconnexion
+  const { user, loading, logout } = useAuth();
+  const isLoggedIn = !!user;
+  console.log('isLoggedIn ' + isLoggedIn);
   const handleLogout = () => {
-    setIsLoggedIn(false);
-    setUserRole(null);
+    logout(); // si ton logout ne redirige pas, le Link pointe vers "/"
+    setMobileMenuOpen(false);
   };
+
+    // Ferme le menu mobile à chaque changement de route
+  React.useEffect(() => {
+    setMobileMenuOpen(false);
+  }, [location.pathname]);
 
   const navigation = [
     { name: "Accueil", href: "/" },
@@ -61,13 +65,8 @@ const Navbar = () => {
               <div className="hidden md:flex items-center space-x-2">
                 {isLoggedIn ? (
                   <>
-                    <Button asChild variant="outline">
-                      <Link to={userRole === "owner" ? "/owner-dashboard" : "/gardener-dashboard"}>
-                        Mon espace
-                      </Link>
-                    </Button>
                     <Button asChild variant="ghost" onClick={handleLogout}>
-                      <Link to="/">Déconnexion</Link>
+                      <Link to="/login">Déconnexion</Link>
                     </Button>
                   </>
                 ) : (
@@ -128,14 +127,6 @@ const Navbar = () => {
             <div className="pt-4 pb-2 flex flex-col gap-2">
               {isLoggedIn ? (
                 <>
-                  <Button asChild variant="outline" className="w-full">
-                    <Link 
-                      to={userRole === "owner" ? "/owner-dashboard" : "/gardener-dashboard"} 
-                      onClick={() => setMobileMenuOpen(false)}
-                    >
-                      Mon espace
-                    </Link>
-                  </Button>
                   <Button asChild variant="ghost" className="w-full" onClick={handleLogout}>
                     <Link to="/" onClick={() => setMobileMenuOpen(false)}>
                       Déconnexion

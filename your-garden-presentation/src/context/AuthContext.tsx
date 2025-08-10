@@ -1,82 +1,85 @@
-// context/AuthContext.tsx
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import { apiFetch } from '../services/fetchClient';
+import { tokenService } from '../services/TokenService';
+import { User } from '@/models/user';
+import { LoginCredentials } from '@/models/loginCredentials';
 
-import { createContext, useContext, useState, useEffect, ReactNode } from "react";
-import { SigninPayload } from "@/models/signin-payload";
-import { SigninResponse } from "@/models/signin-response";
-import { signin } from "@/services/authenticationService";
+// export interface LoginCredentials {
+//   email: string;
+//   password: string;
+//   [key: string]: unknown;
+// }
 
-// Interface du token décodé
-interface DecodedToken {
-  exp: number;
+interface LoginResponse {
+  Token: string;
+  accessToken: string;
+  refreshToken: string;
+  user: User;
 }
 
-interface AuthContextType {
-  user: SigninResponse | null;
-  login: (payload: SigninPayload) => Promise<void>;
+interface AuthContextValue {
+  user: User | null;
+  loading: boolean;
+  login: (credentials: LoginCredentials) => Promise<User>;
   logout: () => void;
-  isAuthenticated: boolean;
-  token: string | null;
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
-export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<SigninResponse | null>(null);
-  const [token, setToken] = useState<string | null>(null);
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
 
-  // Initialisation : charge le user depuis localStorage
   useEffect(() => {
-    const storedUser = localStorage.getItem("authUser");
-    const storedToken = localStorage.getItem("token");
+    const initializeAuth = async () => {
+    const access = tokenService.getLocalAccessToken();
 
-    if (storedUser && storedToken) {
-      setUser(JSON.parse(storedUser));
-      setToken(storedToken);
-    } else {
-      logout(); // token invalide ou inexistant
+      // Sans refresh: si pas d'access ou expiré -> clear direct
+    if (!access || tokenService.isTokenExpired(access)) {
+      tokenService.clearTokens();
+      setLoading(false);
+      return;
     }
+
+      try {
+        const me = await apiFetch<User>("/accounts", { method: "GET" });
+        setUser(me);
+      } catch {
+        tokenService.clearTokens();
+      } finally {
+        setLoading(false);
+      }
+    };
+    void initializeAuth();
   }, []);
 
-  // Sync automatique localStorage <-> state
-  useEffect(() => {
-    if (user && token) {
-      localStorage.setItem("authUser", JSON.stringify(user));
-      localStorage.setItem("token", token);
-    } else {
-      localStorage.removeItem("authUser");
-      localStorage.removeItem("token");
-    }
-  }, [user, token]);
+  const login = useCallback(async (credentials: LoginCredentials): Promise<User> => {
+    const data = await apiFetch<LoginResponse>('/accounts/authenticate', {
+      method: 'POST',
+      json: credentials,
+      auth: false, // pas de bearer sur login
+      retryOnUnauthorized: false
+    });
+    tokenService.updateLocalAccessToken(data.accessToken);
+    console.log("data " + JSON.stringify(data));
 
-  const login = async (payload: SigninPayload) => {
-    try {
-      const response = await signin(payload);
-      setUser(response);
-      setToken(response.token);
-    } catch (error) {
-      console.error("Erreur de connexion :", error);
-      throw error; // à gérer côté UI (affichage erreur)
-    }
-  };
+    setUser(data.user);
+    return data.user;
+  }, []);
 
-  const logout = () => {
+  const logout = useCallback((): void => {
+    tokenService.clearTokens();
     setUser(null);
-    setToken(null);
-    localStorage.removeItem("authUser");
-    localStorage.removeItem("token");
-  };
+    if (typeof window !== 'undefined') window.location.href = '/login';
+  }, []);
 
-  const isAuthenticated = !!user && !!token;
+  const value = useMemo<AuthContextValue>(() => ({ user, loading, login, logout }), [user, loading, login, logout]);
 
-  return (
-    <AuthContext.Provider value={{ user, login, logout, isAuthenticated, token }}>
-      {children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
-export const useAuth = (): AuthContextType => {
+export const useAuth = (): AuthContextValue => {
   const context = useContext(AuthContext);
-  if (!context) throw new Error("useAuth must be used within an AuthProvider");
+  if (!context) throw new Error('useAuth doit être utilisé dans le AuthProvider');
   return context;
 };
