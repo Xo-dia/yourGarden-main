@@ -7,6 +7,6 @@ public record LandDto (
 		String land_name,
 		String land_adresse,
 		int nb_gardens,
-		int imageId,
+		String imageURL,
 		String description) { }
 

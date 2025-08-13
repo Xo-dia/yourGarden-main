@@ -23,7 +23,7 @@ public class Lands extends AbstractEntity {
 	private int nb_gardens;
 	
 	@Column(name = "land_img")
-	private int imageId;
+	private String imageURL;
 	
 	@Column(name = "land_desc")
 	private String description;
@@ -49,8 +49,8 @@ public class Lands extends AbstractEntity {
 		return nb_gardens;
 	}
 	
-	public int getImageId() {
-		return imageId;
+	public String getImageURL() {
+		return imageURL;
 	}
 	
 	public String description() {
@@ -73,8 +73,8 @@ public class Lands extends AbstractEntity {
 		this.description = description;
 	}
 	
-	public void setImageId(int imageId) {
-		this.imageId = imageId;
+	public void setImageURL(String imageURL) {
+		this.imageURL = imageURL;
 	}
 
 	public void setNumber_of_garden(int nb_garden) {

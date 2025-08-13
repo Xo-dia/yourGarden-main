@@ -10,34 +10,68 @@ import jakarta.persistence.Table;
 @Table(name = "t_garden")
 public class Gardens extends AbstractEntity {
 	// mettre l'entité au singulier et la table au pluriel
-	@Column(name = "designation")
-	private String designation;
 
     @Column(name = "surface")
-    private String surface;
+    private int surface;
 
 	// Clé étrangère vers land
     @ManyToOne
     @JoinColumn(name = "land_id", nullable = false)
     private Lands land;
+
+	@Column(name = "garden_desc")
+    private String description;
+	
+	@Column(name = "price")
+    private double price;
+	
+	@Column(name = "garden_img")
+	private String imageURL;
+	
+	@Column(name = "garden_name")
+    private String garden_name;
     
-	public String getDesignation() {
-		return designation;
+    public String getGarden_name() {
+		return garden_name;
 	}
 
-	public String getSurface() {
+	public void setGarden_name(String garden_name) {
+		this.garden_name = garden_name;
+	}
+
+	public String getImageURL() {
+		return imageURL;
+	}
+
+	public void setImageURL(String imageURL) {
+		this.imageURL = imageURL;
+	}
+
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+    
+	public double getPrice() {
+		return price;
+	}
+
+	public void setPrice(double price) {
+		this.price = price;
+	}
+
+	public int getSurface() {
 		return surface;
 	}
 	
     public Lands getLand() {
         return land;
     }
-    
-	public void setDesignation(String designation) {
-		this.designation = designation;
-	}
 
-	public void setSurface(String surface) {
+	public void setSurface(int surface) {
 		this.surface = surface;
 	}
 

@@ -15,7 +15,7 @@ public class LandMapper {
         land.setLand_name(dto.land_name());
         land.setLand_adresse(dto.land_adresse());
         land.setNumber_of_garden(dto.nb_gardens());
-        land.setImageId(dto.imageId());
+        land.setImageURL(dto.imageURL());
         land.setCadastral_reference(dto.cadastral_reference());
         land.setDescription(dto.description());
 
@@ -31,7 +31,7 @@ public class LandMapper {
         		land.getLand_name(),
         		land.getLand_adresse(),
         		land.getnb_garden(),
-        		land.getImageId(),
+        		land.getImageURL(),
         		land.description()
         		);
 
