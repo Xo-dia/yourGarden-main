@@ -19,6 +19,7 @@ const landFormSchema = z.object({
   number_of_gardens: z.coerce.number().min(1, "Le nombre de jardins doit être au moins 1"),
   image_url: z.string().optional(),
   description: z.string().min(20, "La description doit comporter au moins 20 caractères"),
+  complet: z.boolean().optional(), 
 });
 
 type LandForm = z.infer<typeof landFormSchema>;

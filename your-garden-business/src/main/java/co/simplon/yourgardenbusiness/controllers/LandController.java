@@ -2,8 +2,13 @@ package co.simplon.yourgardenbusiness.controllers;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -29,11 +34,12 @@ public class LandController {
 	
 	@GetMapping
 	@ResponseStatus(HttpStatus.OK)
-	public ResponseEntity<List<LandDto>> getLands() {
+	public ResponseEntity<List<LandDto>> getLands(@AuthenticationPrincipal(expression = "claims['sub']") String userId) {
 		List<LandDto> lands = null;
+		var id = Long.valueOf(userId);
 		
 		try {
-			lands =  service.get();
+			lands =  service.get(id);
 			return ResponseEntity.ok(lands);
 		}
 		catch (Exception ex) {
@@ -41,6 +47,21 @@ public class LandController {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(lands);
 		}
 		
+	}
+	
+	@DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteById(@PathVariable Long id) {
+        service.deleteProduit(id); // méthode à implémenter dans ton service
+        return ResponseEntity.noContent().build();
+    }
+	
+	@PutMapping("/{id}")
+	public ResponseEntity<LandDto> updateUser(
+	        @PathVariable Long id,
+	        @RequestBody LandDto landDto) {
+	    
+	    LandDto updatedUser = service.updateProduit(id, landDto);
+	    return ResponseEntity.ok(updatedUser);
 	}
 	
 	@PostMapping

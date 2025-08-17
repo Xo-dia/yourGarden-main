@@ -28,8 +28,8 @@ public class LandService {
 		this.landMapper = landMapper;
 	}
 
-	public List<LandDto> get() {
-		List<Lands> land = this.repository.findAll();
+	public List<LandDto> get(long user_id) {
+		List<Lands> land = this.repository.findByUserId(user_id);
 		return land.stream()
 				.map( x -> landMapper.toDto(x))
 				.collect(Collectors.toList());
@@ -46,9 +46,11 @@ public class LandService {
 		return landMapper.toDto(entity);
 	}
 	
-    public Lands updateProduit(Long id, Lands land) {
+    public LandDto updateProduit(Long id, LandDto landDto) {
         // land.setId(id);
-        return this.repository.save(land);
+    	Lands land = landMapper.toEntity(landDto);
+        land = this.repository.save(land);
+        return landMapper.toDto(land);
     }
 
     public void deleteProduit(Long id) {

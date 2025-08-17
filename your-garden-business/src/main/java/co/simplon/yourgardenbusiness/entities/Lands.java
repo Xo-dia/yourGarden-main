@@ -28,7 +28,19 @@ public class Lands extends AbstractEntity {
 	@Column(name = "land_desc")
 	private String description;
 	
-	   // Clé étrangère vers l'utilisateur
+	@Column(name = "complet", nullable = false)
+	private boolean complet;
+	
+
+	public boolean isComplet() {
+		return complet;
+	}
+
+	public void setComplet(boolean complet) {
+		this.complet = complet;
+	}
+
+	// Clé étrangère vers l'utilisateur
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private Users user;

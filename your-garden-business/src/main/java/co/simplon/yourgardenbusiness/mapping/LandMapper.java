@@ -18,6 +18,7 @@ public class LandMapper {
         land.setImageURL(dto.imageURL());
         land.setCadastral_reference(dto.cadastral_reference());
         land.setDescription(dto.description());
+        land.setComplet(dto.complet());
 
         return land;
     }
@@ -32,7 +33,8 @@ public class LandMapper {
         		land.getLand_adresse(),
         		land.getnb_garden(),
         		land.getImageURL(),
-        		land.description()
+        		land.description(),
+        		land.isComplet()
         		);
 
         return dto;

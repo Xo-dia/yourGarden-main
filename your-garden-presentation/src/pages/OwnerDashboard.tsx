@@ -4,6 +4,9 @@ import { Link } from "react-router-dom";
 import { Users, MapPin, Plus, Edit, Trash2, ArrowLeft } from "lucide-react";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { toast } from "@/components/ui/use-toast";
+import { useEffect, useState } from "react";
+import { deleteLand, getUserLands } from "@/services/LandService";
+import { Land } from "@/models/land";
 
 const OwnerDashboard = () => {
   // Simuler des données qui viendraient du backend
@@ -11,36 +14,42 @@ const OwnerDashboard = () => {
     name: "Pierre Durand",
     membership: "Premium",
     joinedDate: "Mars 2023"
-  };
+  }
+
+   const [myGardens, setMyGardens] = useState<Land[]>([]);
+  const [loading, setLoading] = useState(true);
   
-  const myGardens = [
-    { 
-      id: 1, 
-      name: "Mon Potager Urbain", 
-      address: "12 rue des Fleurs, 75001 Paris",
-      status: "active",
-      parcels: 5,
-      occupiedParcels: 3,
-      image: "https://images.unsplash.com/photo-1585320806297-9794b3e4eeae"
-    },
-    { 
-      id: 2, 
-      name: "Jardin Partagé", 
-      address: "45 avenue des Arbres, 75015 Paris",
-      status: "pending",
-      parcels: 8,
-      occupiedParcels: 0,
-      image: "https://images.unsplash.com/photo-1621955964441-c173e01c6654"
-    }
-  ];
-  
+useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        setLoading(true);
+        const data = await getUserLands();
+        if (!cancelled) setMyGardens(data);
+      } catch (err: unknown) {
+        if (!cancelled) {
+          toast({
+            title: "Erreur de chargement",
+            //description: err?message ?? "Impossible de récupérer vos terrains.",
+            variant: "destructive",
+          });
+        }
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   const gardenRequests = [
     { id: 101, gardenerName: "Marie Dupont", gardenName: "Mon Potager Urbain", date: "10 mai 2023" },
     { id: 102, gardenerName: "Jean Martin", gardenName: "Mon Potager Urbain", date: "12 mai 2023" }
   ];
 
-  const handleDeleteGarden = (gardenId: number, gardenName: string) => {
-    // Simulation de suppression
+  const handleDeleteGarden = async (gardenId: number, gardenName: string) => {
+    await deleteLand(gardenId);
     toast({
       title: "Jardin supprimé",
       description: `Le jardin "${gardenName}" a été supprimé avec succès.`,
@@ -87,29 +96,29 @@ const OwnerDashboard = () => {
                       <div key={garden.id} className="border rounded-lg overflow-hidden">
                         <AspectRatio ratio={16/9}>
                           <img 
-                            src={garden.image} 
-                            alt={garden.name} 
+                            src={garden.imageURL} 
+                            alt={garden.land_name} 
                             className="object-cover w-full h-full" 
                           />
                         </AspectRatio>
                         <div className="p-4">
                           <div className="flex justify-between items-start mb-2">
-                            <h3 className="font-medium">{garden.name}</h3>
+                            <h3 className="font-medium">{garden.land_name}</h3>
                             <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                              garden.status === "active" 
+                              !garden.complet 
                                 ? "bg-green-100 text-green-800" 
                                 : "bg-yellow-100 text-yellow-800"
                             }`}>
-                              {garden.status === "active" ? "Actif" : "En attente"}
+                              {!garden.complet ? "Actif" : "En attente"}
                             </span>
                           </div>
                           <div className="flex items-center text-sm text-muted-foreground mb-2">
                             <MapPin className="mr-1 h-4 w-4" />
-                            {garden.address}
+                            {garden.land_adresse}
                           </div>
                           <div className="flex items-center text-sm text-muted-foreground mb-4">
                             <Users className="mr-1 h-4 w-4" />
-                            {garden.occupiedParcels} parcelles occupées sur {garden.parcels}
+                           {/* {garden.occupiedParcels} parcelles occupées sur {garden.nb_gardens}*/}
                           </div>
                           <div className="flex gap-2">
                             <Button asChild variant="outline" size="sm">
@@ -128,7 +137,7 @@ const OwnerDashboard = () => {
                               variant="outline" 
                               size="sm" 
                               className="text-destructive hover:text-destructive"
-                              onClick={() => handleDeleteGarden(garden.id, garden.name)}
+                              onClick={() => handleDeleteGarden(garden.id, garden.land_name)}
                             >
                               <Trash2 className="h-4 w-4" />
                             </Button>
@@ -187,25 +196,25 @@ const OwnerDashboard = () => {
               <div className="grid md:grid-cols-4 gap-4">
                 <div className="border rounded-lg p-4 text-center">
                   <div className="text-3xl font-bold text-primary mb-1">
-                    {myGardens.reduce((acc, garden) => acc + garden.parcels, 0)}
+                    {myGardens.reduce((acc, garden) => acc + garden.nb_gardens, 0)}
                   </div>
                   <div className="text-sm text-muted-foreground">Parcelles totales</div>
                 </div>
                 <div className="border rounded-lg p-4 text-center">
                   <div className="text-3xl font-bold text-primary mb-1">
-                    {myGardens.reduce((acc, garden) => acc + garden.occupiedParcels, 0)}
+                    {/*{myGardens.reduce((acc, garden) => acc + garden.occupiedParcels, 0)}*/}
                   </div>
                   <div className="text-sm text-muted-foreground">Parcelles occupées</div>
                 </div>
                 <div className="border rounded-lg p-4 text-center">
                   <div className="text-3xl font-bold text-primary mb-1">
-                    {myGardens.filter(garden => garden.status === "active").length}
+                    {myGardens.filter(garden => garden.complet ).length}
                   </div>
                   <div className="text-sm text-muted-foreground">Jardins actifs</div>
                 </div>
                 <div className="border rounded-lg p-4 text-center">
                   <div className="text-3xl font-bold text-primary mb-1">
-                    {myGardens.reduce((acc, garden) => acc + garden.occupiedParcels * 25, 0)}€
+                   {/* {myGardens.reduce((acc, garden) => acc + garden.occupiedParcels * 25, 0)}€ */}
                   </div>
                   <div className="text-sm text-muted-foreground">Revenus mensuels</div>
                 </div>

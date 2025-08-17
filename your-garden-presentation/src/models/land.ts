@@ -6,6 +6,7 @@ export interface Land {
 		nb_gardens: number,
 		imageURL: string,
 		description: string,
+		complet: boolean,
 		user_id: number,
 		id: number,
 }

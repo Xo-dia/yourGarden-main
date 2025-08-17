@@ -30,3 +30,20 @@ export async function addLand(dto: Land): Promise<Land> {
 export async function getLand(id: number): Promise<Land> {
   return apiFetch<Land>(`/lands/${id}`, { method: "GET" });
 }
+
+export async function getUserLands(): Promise<Land[]> {
+  return apiFetch<Land[]>(`/lands`, {
+    method: "GET",
+  });
+}
+
+export async function deleteLand(id: number): Promise<void> {
+  return apiFetch(`/lands/${id}`, { method: "DELETE" });
+}
+
+ export async function updateLand(id: number, dto: Partial<Land>): Promise<Land> {
+   return apiFetch<Land>(`/lands/${id}`, {
+     method: "PUT",
+     json: dto,
+   });
+ }

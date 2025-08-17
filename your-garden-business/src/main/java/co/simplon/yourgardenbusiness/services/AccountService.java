@@ -78,5 +78,6 @@ public class AccountService {
         Users u = findById(id);      // réutilise la logique existante (et l’exception si non trouvé)
         return userMapper.toDto(u);  // mappe vers le DTO public
     }
+		
 }
 
