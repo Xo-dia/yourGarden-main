@@ -19,6 +19,7 @@ import Navbar from "./components/Navbar";
 import { AuthProvider } from "./context/AuthContext";
 import RedirectIfAuthed from "./guards/RedirectIfAuthed";
 import ManageLands from "./pages/ManageLands";
+import AddGardens from "./pages/AddGardens";
 
 const queryClient = new QueryClient();
 
@@ -46,6 +47,7 @@ const AppContent = () => {
         <Route path="/gardener-dashboard" element={<GardenerDashboard />} />
         <Route path="/owner-dashboard" element={<OwnerDashboard />} />
         <Route path="/manage-lands" element={<ManageLands />} />
+        <Route path="/lands/:landId/add-gardens" element={<AddGardens />} />
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
         <Route path="*" element={<NotFound />} />
       </Routes>

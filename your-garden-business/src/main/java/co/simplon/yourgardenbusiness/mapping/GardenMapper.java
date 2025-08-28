@@ -1,10 +1,13 @@
 package co.simplon.yourgardenbusiness.mapping;
 
+import org.springframework.stereotype.Component;
+
 import co.simplon.yourgardenbusiness.dtos.GardenDto;
 import co.simplon.yourgardenbusiness.dtos.LandDto;
 import co.simplon.yourgardenbusiness.entities.Gardens;
 import co.simplon.yourgardenbusiness.entities.Lands;
 
+@Component
 public class GardenMapper {
 
     public Gardens toEntity(GardenDto dto) {

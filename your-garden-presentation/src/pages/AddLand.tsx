@@ -51,15 +51,11 @@ const AddLand = () => {
         land_name: data.name,
         land_adresse: data.address,
         nb_gardens: data.number_of_gardens,
-        // ima: data.image_url || null,
+        imageURL: data.image_url ?? "",
         description: data.description,
-        postalCode: "",
-        city: "",
-        imageId: 0,
+        complet: data.complet ?? false,
         user_id: user.id,
         id: 0,
-        plotSize: "",
-        price: ""
       }
       // Call the addLand service with the payload and token
     const land: Land = await addLand(payload);      // const { data: { user } } = await supabase.auth.getUser();
@@ -69,7 +65,7 @@ const AddLand = () => {
       });
 
       // suppose que l’API renvoie l’objet avec un id
-      navigate(`/manage-lands/${land.id}`);
+      navigate(`/lands/${land.id}/add-gardens?count=${land.nb_gardens}`);
       // if (!user) {
       //   toast({
       //     title: "Erreur d'authentification",
@@ -109,7 +105,7 @@ const AddLand = () => {
       });
 
       // Rediriger vers la page de gestion des jardins
-      navigate(`/manage-lands/${land.id}`);
+      navigate(`/lands/${land.id}/add-gardens?count=${land.nb_gardens}`);
     } catch (error) {
       console.error('Error:', error);
       toast({

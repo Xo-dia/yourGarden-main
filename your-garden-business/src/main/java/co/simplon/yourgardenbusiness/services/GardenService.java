@@ -3,6 +3,9 @@ package co.simplon.yourgardenbusiness.services;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import co.simplon.yourgardenbusiness.dtos.GardenDto;
 import co.simplon.yourgardenbusiness.entities.Gardens;
 import co.simplon.yourgardenbusiness.entities.Lands;
@@ -11,6 +14,8 @@ import co.simplon.yourgardenbusiness.repositories.GardenRepository;
 import co.simplon.yourgardenbusiness.repositories.LandRepository;
 import jakarta.persistence.EntityNotFoundException;
 
+@Service
+@Transactional
 public class GardenService {
 
 	private final GardenRepository repository; 
