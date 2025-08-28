@@ -28,7 +28,7 @@ const AddLand = () => {
   console.log("AddLand component is loading with terrainFormSchema");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
-    const { user } = useAuth();
+  const { user } = useAuth();
   
   const form = useForm<LandForm>({
     resolver: zodResolver(landFormSchema),

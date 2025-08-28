@@ -39,5 +39,17 @@ public class LandMapper {
 
         return dto;
     }
+    
+    public void updateEntityFromDto(LandDto dto, Lands land) {
+        if (dto == null || land == null) return;
+
+        land.setLand_name(dto.land_name());
+        land.setLand_adresse(dto.land_adresse());
+        land.setNumber_of_garden(dto.nb_gardens());
+        land.setImageURL(dto.imageURL());
+        land.setCadastral_reference(dto.cadastral_reference());
+        land.setDescription(dto.description());
+        land.setComplet(dto.complet());
+    }
 }
 

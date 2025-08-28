@@ -9,75 +9,95 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
+import { getLand, updateLand } from "@/services/LandService";
+import type { Land } from "@/models/land";
 
-const gardenFormSchema = z.object({
-  name: z.string().min(3, "Le nom du jardin doit comporter au moins 3 caractères"),
+const landFormSchema = z.object({
+  cadastral_reference: z.string().min(5, "La référence cadastrale doit comporter au moins 5 caractères"),
+  name: z.string().min(3, "Le nom du terrain doit comporter au moins 3 caractères"),
   address: z.string().min(5, "Veuillez entrer une adresse valide"),
-  city: z.string().min(2, "Veuillez entrer une ville valide"),
-  postalCode: z.string().min(5, "Veuillez entrer un code postal valide"),
+  number_of_gardens: z.coerce.number().min(1, "Le nombre de jardins doit être au moins 1"),
+  image_url: z.string().optional(),
   description: z.string().min(20, "La description doit comporter au moins 20 caractères"),
-  totalPlots: z.coerce.number().min(1, "Doit être au moins 1"),
-  plotSize: z.string().min(2, "Veuillez préciser la taille des parcelles"),
-  price: z.string().min(1, "Veuillez préciser le prix mensuel"),
 });
 
-type GardenForm = z.infer<typeof gardenFormSchema>;
+type LandForm = z.infer<typeof landFormSchema>;
 
-const EditGarden = () => {
+const EditLand = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [currentLand, setCurrentLand] = useState<Land | null>(null);
   
-  const form = useForm<GardenForm>({
-    resolver: zodResolver(gardenFormSchema),
+  const form = useForm<LandForm>({
+    resolver: zodResolver(landFormSchema),
     defaultValues: {
+      cadastral_reference: "",
       name: "",
       address: "",
-      city: "",
-      postalCode: "",
+      number_of_gardens: 1,
+      image_url: "",
       description: "",
-      totalPlots: 1,
-      plotSize: "",
-      price: "",
     },
   });
 
-  // Simuler le chargement des données du terrain
   useEffect(() => {
-    const loadGardenData = () => {
-      // Simulation des données existantes
-      const gardenData = {
-        name: "Mon Potager Urbain",
-        address: "12 rue des Fleurs",
-        city: "Paris",
-        postalCode: "75001",
-        description: "Un beau potager urbain avec 5 parcelles disponibles pour les jardiniers passionnés.",
-        totalPlots: 5,
-        plotSize: "4m²",
-        price: "25€/mois",
-      };
-      
-      form.reset(gardenData);
-      setIsLoading(false);
+    let mounted = true;
+    const load = async () => {
+      if (!id) return;
+      try {
+        const land = await getLand(Number(id));
+        if (!mounted) return;
+        setCurrentLand(land);
+        form.reset({
+          cadastral_reference: land.cadastral_reference ?? "",
+          name: land.land_name ?? "",
+          address: land.land_adresse ?? "",
+          number_of_gardens: land.nb_gardens ?? 1,
+          image_url: (land as any).image_url ?? (land as any).imageURL ?? "",
+          description: land.description ?? "",
+        });
+      } catch (error) {
+        toast({
+          title: "Erreur",
+          description: "Impossible de charger le terrain.",
+          variant: "destructive",
+        });
+      } finally {
+        if (mounted) setIsLoading(false);
+      }
     };
-
-    setTimeout(loadGardenData, 1000);
+    load();
+    return () => { mounted = false; };
   }, [id, form]);
   
-  const onSubmit = (data: GardenForm) => {
+  const onSubmit = async (data: LandForm) => {
+    if (!id) return;
     setIsSubmitting(true);
-    
-    // Simulation d'un appel API
-    setTimeout(() => {
-      console.log("Terrain modifié:", data);
+    try {
+      const dto: Partial<Land> = {
+        cadastral_reference: data.cadastral_reference,
+        land_name: data.name,
+        land_adresse: data.address,
+        nb_gardens: data.number_of_gardens,
+        description: data.description,
+      };
+      await updateLand(Number(id), dto);
       toast({
         title: "Terrain modifié avec succès !",
         description: "Les modifications ont été enregistrées.",
       });
+      navigate(`/manage-lands/${id}`);
+    } catch (error) {
+      toast({
+        title: "Erreur",
+        description: "La mise à jour du terrain a échoué.",
+        variant: "destructive",
+      });
+    } finally {
       setIsSubmitting(false);
-      navigate("/owner-dashboard");
-    }, 1500);
+    }
   };
 
   if (isLoading) {
@@ -109,71 +129,90 @@ const EditGarden = () => {
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
               <div className="space-y-4">
-                <h2 className="text-xl font-semibold">Informations générales</h2>
+                <h2 className="text-xl font-semibold">Informations du terrain</h2>
                 
                 <FormField
                   control={form.control}
-                  name="name"
+                  name="cadastral_reference"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Nom du jardin</FormLabel>
+                      <FormLabel>Référence cadastrale</FormLabel>
                       <FormControl>
-                        <Input placeholder="ex: Jardin des Fleurs" {...field} />
+                        <Input placeholder="ex: 123456789" {...field} />
                       </FormControl>
                       <FormDescription>
-                        Choisissez un nom attrayant pour votre jardin
+                        Référence unique du terrain selon le cadastre
                       </FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
-                
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="address"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Adresse</FormLabel>
-                        <FormControl>
-                          <Input placeholder="15 rue des Jardins" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <div className="grid grid-cols-2 gap-4">
-                    <FormField
-                      control={form.control}
-                      name="postalCode"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Code postal</FormLabel>
-                          <FormControl>
-                            <Input placeholder="75011" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    
-                    <FormField
-                      control={form.control}
-                      name="city"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Ville</FormLabel>
-                          <FormControl>
-                            <Input placeholder="Paris" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-                </div>
-                
+
+                <FormField
+                  control={form.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Nom du terrain</FormLabel>
+                      <FormControl>
+                        <Input placeholder="ex: Terrain des Fleurs" {...field} />
+                      </FormControl>
+                      <FormDescription>
+                        Choisissez un nom attrayant pour votre terrain
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="address"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Adresse complète</FormLabel>
+                      <FormControl>
+                        <Input placeholder="15 rue des Jardins, 75011 Paris" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="number_of_gardens"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Nombre de jardins</FormLabel>
+                      <FormControl>
+                        <Input type="number" min="1" placeholder="ex: 5" {...field} />
+                      </FormControl>
+                      <FormDescription>
+                        Nombre maximum de jardins sur ce terrain
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="image_url"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Image du terrain (optionnel)</FormLabel>
+                      <FormControl>
+                        <Input placeholder="https://exemple.com/image.jpg" {...field} />
+                      </FormControl>
+                      <FormDescription>
+                        URL d'une image représentant votre terrain
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
                 <FormField
                   control={form.control}
                   name="description"
@@ -182,7 +221,7 @@ const EditGarden = () => {
                       <FormLabel>Description</FormLabel>
                       <FormControl>
                         <Textarea 
-                          placeholder="Décrivez votre jardin, son environnement, ses caractéristiques..." 
+                          placeholder="Décrivez votre terrain, son environnement, ses caractéristiques..." 
                           className="min-h-32"
                           {...field} 
                         />
@@ -194,54 +233,6 @@ const EditGarden = () => {
                     </FormItem>
                   )}
                 />
-              </div>
-              
-              <div className="space-y-4 pt-4 border-t">
-                <h2 className="text-xl font-semibold">Informations des parcelles</h2>
-                
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="totalPlots"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Nombre de parcelles</FormLabel>
-                        <FormControl>
-                          <Input type="number" min="1" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <FormField
-                    control={form.control}
-                    name="plotSize"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Taille d'une parcelle</FormLabel>
-                        <FormControl>
-                          <Input placeholder="ex: 4m²" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <FormField
-                    control={form.control}
-                    name="price"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Prix mensuel</FormLabel>
-                        <FormControl>
-                          <Input placeholder="ex: 15€/mois" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
               </div>
               
               <div className="pt-4 border-t flex gap-4">
@@ -260,4 +251,4 @@ const EditGarden = () => {
   );
 };
 
-export default EditGarden;
+export default EditLand;

@@ -7,26 +7,35 @@ import { toast } from "@/components/ui/use-toast";
 import { useEffect, useState } from "react";
 import { deleteLand, getUserLands } from "@/services/LandService";
 import { Land } from "@/models/land";
+import { useAuth } from "@/context/AuthContext";
+import { getGardenReservation, updateGardenReservation } from "../services/gardenReservationService";
+import { GardenReservation, ReservationStatus } from "../models/GardenReservation";
 
 const OwnerDashboard = () => {
-  // Simuler des données qui viendraient du backend
+  const [myGardens, setMyGardens] = useState<Land[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [deletingId, setDeletingId] = useState<number | null>(null);
+  const { user } = useAuth();
   const userInfo = {
-    name: "Pierre Durand",
+    name: user?.last_name + " "+ user?.first_name,
     membership: "Premium",
     joinedDate: "Mars 2023"
   }
+  const [gardenRequests, setGardenRequests] = useState<GardenReservation[]>([]);
 
-   const [myGardens, setMyGardens] = useState<Land[]>([]);
-  const [loading, setLoading] = useState(true);
-  
-useEffect(() => {
+  useEffect(() => {
     let cancelled = false;
     (async () => {
       try {
         setLoading(true);
         const data = await getUserLands();
         if (!cancelled) setMyGardens(data);
+
+       const gardens = await getGardenReservation();
+       setGardenRequests(gardens);
+        console.log("Fetched reservations:", gardens);
       } catch (err: unknown) {
+        console.log("Error fetching reservations:", err);
         if (!cancelled) {
           toast({
             title: "Erreur de chargement",
@@ -43,18 +52,48 @@ useEffect(() => {
     };
   }, []);
 
-  const gardenRequests = [
-    { id: 101, gardenerName: "Marie Dupont", gardenName: "Mon Potager Urbain", date: "10 mai 2023" },
-    { id: 102, gardenerName: "Jean Martin", gardenName: "Mon Potager Urbain", date: "12 mai 2023" }
-  ];
+  // const gardenRequests = [
+  //   { id: 101, gardenerName: "Marie Dupont", gardenName: "Mon Potager Urbain", date: "10 mai 2023" },
+  //   { id: 102, gardenerName: "Jean Martin", gardenName: "Mon Potager Urbain", date: "12 mai 2023" }
+  // ];
 
   const handleDeleteGarden = async (gardenId: number, gardenName: string) => {
+    setDeletingId(gardenId);    
     await deleteLand(gardenId);
+    setMyGardens(prev => prev.filter(g => g.id !== gardenId)); // maj immédiate
+
     toast({
       title: "Jardin supprimé",
       description: `Le jardin "${gardenName}" a été supprimé avec succès.`,
     });
   };
+
+const [updatingId, setUpdatingId] = useState<number | null>(null);
+
+async function handleUpdateReservation(id: number, status: ReservationStatus) {
+  setUpdatingId(id);
+  try {
+    await updateGardenReservation(id, { status }); // PUT /status
+    const gardens = await getGardenReservation();   // refetch
+    setGardenRequests(gardens);
+
+    toast({
+      title: "Choix pris en compte",
+      description: `La réservation #${id} est maintenant "${status}".`,
+    });
+  } catch (err: unknown) {
+    const message = "Impossible de mettre à jour la réservation.";
+    toast({
+      title: "Erreur",
+      description: message,
+      variant: "destructive",
+    });
+  } finally {
+    setUpdatingId(null);
+  }
+}
+
+
 
   return (
     <div className="min-h-screen">
@@ -138,6 +177,7 @@ useEffect(() => {
                               size="sm" 
                               className="text-destructive hover:text-destructive"
                               onClick={() => handleDeleteGarden(garden.id, garden.land_name)}
+                              disabled={deletingId === garden.id}
                             >
                               <Trash2 className="h-4 w-4" />
                             </Button>
@@ -169,11 +209,11 @@ useEffect(() => {
                       <div key={request.id} className="border rounded-lg p-4">
                         <div className="font-medium mb-1">{request.gardenerName}</div>
                         <div className="text-sm text-muted-foreground mb-3">
-                          Demande pour {request.gardenName} le {request.date}
+                          Demande pour {request.gardenName} le {request.requestDate.toLocaleString()}
                         </div>
                         <div className="flex gap-2">
-                          <Button variant="outline" size="sm" className="flex-1">Refuser</Button>
-                          <Button size="sm" className="flex-1">Accepter</Button>
+                          <Button onClick={() => handleUpdateReservation(request.id, ReservationStatus.REJECTED)} variant="outline" size="sm" className="flex-1">Refuser</Button>
+                          <Button onClick={() => handleUpdateReservation(request.id, ReservationStatus.ACCEPTED)} size="sm" className="flex-1">Accepter</Button>
                         </div>
                       </div>
                     ))}

@@ -39,12 +39,28 @@ public class LandController {
 		var id = Long.valueOf(userId);
 		
 		try {
-			lands =  service.get(id);
+			lands =  service.getUserLands(id);
 			return ResponseEntity.ok(lands);
 		}
 		catch (Exception ex) {
 			//TODO; logger
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(lands);
+		}
+		
+	}
+	
+	@GetMapping("/{id}")
+	@ResponseStatus(HttpStatus.OK)
+	public ResponseEntity<LandDto> getLand(@PathVariable long id) {
+		LandDto response = null;
+
+		try {
+			response =  service.getLandById(id);
+			return ResponseEntity.ok(response);
+		}
+		catch (Exception ex) {
+			//TODO; logger
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
 		}
 		
 	}

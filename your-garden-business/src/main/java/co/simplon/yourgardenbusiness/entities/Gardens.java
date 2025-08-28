@@ -7,7 +7,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "t_garden")
+@Table(name = "t_gardens")
 public class Gardens extends AbstractEntity {
 	// mettre l'entité au singulier et la table au pluriel
 
