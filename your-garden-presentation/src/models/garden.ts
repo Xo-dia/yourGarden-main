@@ -1,6 +1,6 @@
 export interface Garden {
   id: string;
-  name: string;
+  garden_name: string;
   surface: number;
   price: number;
   description: string;

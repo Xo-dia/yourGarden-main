@@ -12,7 +12,7 @@ import { toast } from "@/hooks/use-toast";
 import { createGarden } from "@/services/gardenService";
 
 const gardenSchema = z.object({
-  name: z.string().min(3, "Le nom doit comporter au moins 3 caractères"),
+  garden_name: z.string().min(3, "Le nom doit comporter au moins 3 caractères"),
   surface: z.coerce.number().min(1, "Surface minimale: 1 m²"),
   price: z.coerce.number().min(0, "Le prix doit être positif"),
   description: z.string().min(10, "La description doit comporter au moins 10 caractères"),
@@ -44,7 +44,7 @@ const AddGardens = () => {
     resolver: zodResolver(formSchema),
     defaultValues: {
       gardens: Array.from({ length: gardensCount }).map(() => ({
-        name: "",
+        garden_name: "",
         surface: 1,
         price: 0,
         description: "",
@@ -87,7 +87,7 @@ const AddGardens = () => {
     try {
       for (const g of values.gardens) {
         await createGarden({
-          garden_name: g.name,
+          garden_name: g.garden_name,
           surface: Number(g.surface),
           price: Number(g.price),
           description: g.description,
@@ -155,7 +155,7 @@ const AddGardens = () => {
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <FormField
                           control={form.control}
-                          name={`gardens.${currentIndex}.name` as const}
+                          name={`gardens.${currentIndex}.garden_name` as const}
                           render={({ field }) => (
                             <FormItem>
                               <FormLabel>Nom</FormLabel>
