@@ -110,15 +110,13 @@ public class SecurityConfig {
 		// Multiple matchers to map verbs + paths + authorizations
 		// "authorizations": anonymous, permit, deny and more...
 		// By configuration (filterChain), also by annotations...
-		.authorizeHttpRequests((req) -> req.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-
-			.requestMatchers(HttpMethod.POST, "/accounts", "/accounts/authenticate").anonymous())
-
-		.authorizeHttpRequests(
-			(req) -> req.requestMatchers(HttpMethod.GET, "/accounts/with-role").hasRole("MANAGER"))
-
-		// Always last rule:
-		.authorizeHttpRequests((reqs) -> reqs.anyRequest().authenticated())
+		.authorizeHttpRequests((req) ->
+			req.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+		       .requestMatchers("/actuator/health", "/actuator/info").permitAll()
+			   .requestMatchers(HttpMethod.POST, "/accounts", "/accounts/authenticate").anonymous()
+			   .requestMatchers(HttpMethod.GET, "/accounts/with-role").hasRole("MANAGER")
+			   .anyRequest().authenticated()
+		)
 		.oauth2ResourceServer((srv) -> srv.jwt(Customizer.withDefaults()))
 		// The build method builds the configured SecurityFilterChain
 		// with all the specified configuration
